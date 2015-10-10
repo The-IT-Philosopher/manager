@@ -18,7 +18,13 @@ class Renderer {
     echo "<meta charset='utf-8'></head><body>";
   }
   public function html_content($data) {
-    echo $data['content_raw'];
+//    echo $data['content_raw'];
+    echo "<div id=menu>";
+    foreach ($data['menu'] as $menuItem) {
+      echo "<a href=/" .$menuItem['slug'] .">". $menuItem['title'] . "</a>";
+    }
+    echo "</div>";
+    echo "<div id=raw>" . $data['content_raw'] . "</div>";
   }
   public function html_footer($data) {
     echo "</body>";
