@@ -179,7 +179,7 @@ class Customer {
          break;
        }
      case 7:
-      if ($_SESSION['CustomerAddWizard']['OrganisationRegion']=="EU") {
+      if ($_SESSION['CustomerAddWizard']['OrganisationRegion']=="EU" && !isset($_POST['skip_vat'])) {
 
         //TODO check organisation type to see if VAT is required!
 
@@ -212,6 +212,12 @@ class Customer {
          $data['content_raw'] .= "<table>";
          $data['content_raw'] .= "<tr><td>BTW Nummer</td><td><input type=text name=vat></td></tr>";
          $data['content_raw'] .= "<tr><td></td><td><input type=submit value=volgense></td></tr>";
+         if ($_SESSION['CustomerAddWizard']['organisationType']!="company") {
+           // Companies always have a VAT number
+           // Foundations and associations might have a VAT number
+           // So we offer to skip VAT validation if the Orgnisation type is not a company
+           $data['content_raw'] .= "<tr><td></td><td><input type=submit name='skip_vat' value='Overslaan'></td></tr>";
+         } 
          $data['content_raw'] .= "</table></form>";
          break;
        }
