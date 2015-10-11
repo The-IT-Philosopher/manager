@@ -21,7 +21,7 @@ class Renderer {
 //    echo $data['content_raw'];
     echo "<div id=menu>";
     foreach ($data['menu'] as $menuItem) {
-      echo "<a href=/" .$menuItem['slug'] .">". $menuItem['title'] . "</a>";
+      echo "<a href=/" .$menuItem['slug'] ."><button>". $menuItem['title'] . "</button></a>";
     }
     echo "</div>";
     echo "<div id=raw>" . $data['content_raw'] . "</div>";

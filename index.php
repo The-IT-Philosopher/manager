@@ -39,11 +39,22 @@ if (isset($_SESSION['user'])) {
     $menuItem['slug']  = "customers";
     $data['menu'][]=$menuItem;
 
+    // wizards will be automtated in a later stage of development
+    // in this pre-alpha state this will be good enough
     if ($request[0]=="customers") {
       require_once("components/Customer/Customer.php");
-      echo "Klantenbeheer";
-      echo "<a href=/customers/add><button>Nieuwe Klant</button></a>";
+      $data['content_raw'] .= "Klantenbeheer<br>";
+      $data['content_raw'] .= "<a href=/customers/add><button>Nieuwe Klant</button></a><br>";
       if ($request[1]=="add") Customer::addWizard();
+    }
+
+    if ($request[0]=="projects") {
+      require_once("components/Project/Project.php");
+      $data['content_raw'] .= "Projectenbeheer<br>"; 
+      $data['content_raw'] .= "<a href=/projects/add><button>Nieuw Project</button></a>";
+      $data['content_raw'] .= "<a href=/projects/declare><button>Uren declareren</button></a>";
+      if ($request[1]=="add") Project::addWizard();
+      if ($request[1]=="declare") Project::declareWizard();
     }
 
   } 

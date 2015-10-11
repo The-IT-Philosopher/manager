@@ -226,11 +226,29 @@ class Customer {
        $_SESSION['CustomerAddWizard']['page']++;
      }  
      case 8:
-      $data['content_raw'] .= "done";
+      //all done, add the record to customer data;
+      $sth = $pdo->prepare("INSERT INTO customer (customer_id) VALUES (NULL)");
+      $sth->execute();
+      $insertData = array();
+      // last step, we don't need to store the value elsewhere
+      // but in future revisions we'll propably handle ids differently anyways
+      $insertData[':customer_id']=$pdo->lastInsertId();
+ 
+      if ($_SESSION['CustomerAddWizard']['customerType']=="person") {
+        $insertData[':person_id']=$_SESSION['CustomerAddWizard']['personId'];
+        $sth = $pdo->prepare("INSERT INTO link_customer2person (customer_id, person_id) 
+                              VALUES (:customer_id, :person_id)");
 
+      }
+
+      if ($_SESSION['CustomerAddWizard']['customerType']=="organisation") {
+        $insertData[':organisation_id']=$_SESSION['CustomerAddWizard']['organisationId'];
+        $sth = $pdo->prepare("INSERT INTO link_customer2organisation (customer_id, organisation_id)
+                              VALUES (:customer_id, :organisation_id)");
+      }
+      $sth->execute($insertData);
     }
   }
-
 }
 
 
