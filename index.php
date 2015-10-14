@@ -20,6 +20,7 @@ $data['content_raw']  = "<h3>Hello World!</h3>";
 
 if (!isset($_SESSION['user'])) {
   $data['content_raw'] .= "<h2>Login Required</h2>";
+  $user = new User(); 
   $data['content_raw'] .= $user->LoginForm();
   $test = $user->ProcessLogin();
   //$data['content_raw'] .= "<br>$test<br>";
@@ -54,7 +55,8 @@ if (isset($_SESSION['user'])) {
       $data['content_raw'] .= "<a href=/projects/add><button>Nieuw Project</button></a>";
       $data['content_raw'] .= "<a href=/projects/declare><button>Uren declareren</button></a>";
       if ($request[1]=="add") Project::addWizard();
-      if ($request[1]=="declare") Project::declareWizard();
+      else if ($request[1]=="declare") Project::declareWizard();
+      else Project::view();
     }
 
   } 
@@ -68,7 +70,7 @@ if (isset($errors)) {
   }
 } else echo "no errors set<br>";
 //$data['content_raw'] .= "<br><table><tr><td>SERVER<br><pre>" . var_export($_SERVER,true) . "</pre></td><td>POST<br><pre>" . var_export($_POST,true) . "</pre>SESSION<br><pre>" . var_export($_SESSION,true) . "</pre></td></tr></table>";
-$data['content_raw'] .= "<td>SESSION<br><pre>" . var_export($_SESSION,true) . "</pre></td></tr></table>";
+$data['content_raw'] .= "<td>POST<br><pre>" . var_export($_POST,true) . "</pre>SESSION<br><pre>" . var_export($_SESSION,true) . "</pre></td></tr></table>";
 
 $renderer->render($data);
 ?>

@@ -20,7 +20,9 @@ class User {
       echo "checking session for ".$_COOKIE['ItPhilManagerSession']."<br>";
       $sth = $pdo->prepare("SELECT user.user_id as user_id from user
                             JOIN link_session2user
+                            ON link_session2user.user_id = user.user_id
                             JOIN session
+                            ON link_session2user.session_id = session.session_id
                             WHERE session_hash = :session_hash");
       $sth->execute(array(":session_hash" => $_COOKIE['ItPhilManagerSession']));
       $user_id = $sth->fetchColumn();
@@ -45,7 +47,9 @@ class User {
     $sth = $pdo->prepare("SELECT user_pbkdf2, user.user_id as user_id
                    FROM user
                    JOIN link_email2user 
+                   ON link_email2user.user_id = user.user_id
                    JOIN email 
+                   ON link_email2user.email_id = email.email_id
                    WHERE email_address = :email");
      $sth->execute(array(":email" => $_POST['email']));
      $loginData = $sth->fetch();
