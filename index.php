@@ -46,7 +46,8 @@ if (isset($_SESSION['user'])) {
       require_once("components/Customer/Customer.php");
       $data['content_raw'] .= "Klantenbeheer<br>";
       $data['content_raw'] .= "<a href=/customers/add><button>Nieuwe Klant</button></a><br>";
-      if ($request[1]=="add") Customer::addWizard();
+      if ($request[1]=="add") Customer::addWizard(); 
+      else Customer::view();
     }
 
     if ($request[0]=="projects") {

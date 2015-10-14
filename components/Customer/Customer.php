@@ -249,6 +249,29 @@ class Customer {
       $sth->execute($insertData);
     }
   }
+
+  function view(){
+    global $pdo;
+    global $data;
+            $sth = $pdo->prepare("SELECT customer_id, customer_name
+                                  FROM (SELECT customer_id,organisation_name as customer_name
+                                        FROM   link_customer2organisation
+                                        JOIN   organisation 
+                                        ON link_customer2organisation.organisation_id = organisation.organisation_id) ALIAS_A  
+                                  UNION (SELECT customer_id,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name)  as customer_name
+                                        FROM   link_customer2person
+                                        JOIN    person
+                                        ON link_customer2person.person_id = person.person_id ) ");
+            $sth->execute();
+            $data['content_raw'] .= "<table>";
+            while ($customer = $sth->fetch()){
+              $data['content_raw'] .= "<tr><td>".sprintf("%04d ",$customer['customer_id'])."</td><td>".$customer['customer_name']."</td></tr>";
+
+            }
+            $data['content_raw'] .= "</table>";
+
+  }
+
 }
 
 

@@ -63,7 +63,9 @@ echo "<pre>" . var_export($loginData,true) . "</pre>";
      if ($validPassword) {
        echo "password valid, creating session";
        $data = array();
-       $data[":session_hash"]=sha1(mcrypt_create_iv(16));
+       //$data[":session_hash"]=sha1(mcrypt_create_iv(16));
+       //mcrypt_create_iv(16) caused a hang on production server
+       $data[":session_hash"]=sha1(rand());
        if (strstr($_SERVER['REMOTE_ADDR'],":")) {
          // Remote address is IPv6 or IPv4 in IPv6 notation
          $data[":session_ip_start"] =inet_pton($_SERVER['REMOTE_ADDR']);
