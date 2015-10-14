@@ -78,7 +78,7 @@ echo "<pre>" . var_export($loginData,true) . "</pre>";
        if(!$sth->execute($data)) {
          //todo: error handling
        } 
-       setcookie("ItPhilManagerSession", $data[":session_hash"] , 2147483647 ) //PHP_INT_MAX); 
+       setcookie("ItPhilManagerSession", $data[":session_hash"] , 2147483647 ); //PHP_INT_MAX); 
        // PHP_MAX_INT causes problem on production server:
        // PHP Warning:  Expiry date cannot have a year greater than 9999 
        // and does not set cookie. I suppose using the max 32 bit value solves the problem.... until 2038
