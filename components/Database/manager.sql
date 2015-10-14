@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.10deb1
+-- version 4.5.0.2
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 09, 2015 at 12:25 PM
--- Server version: 5.5.44-0ubuntu0.14.04.1
--- PHP Version: 5.5.9-1ubuntu4.13
+-- Generation Time: Oct 14, 2015 at 04:23 PM
+-- Server version: 10.0.21-MariaDB-log
+-- PHP Version: 5.6.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -14,7 +14,7 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `manager`
@@ -26,17 +26,27 @@ SET time_zone = "+00:00";
 -- Table structure for table `address`
 --
 
-CREATE TABLE IF NOT EXISTS `address` (
-  `adress_id` int(11) NOT NULL AUTO_INCREMENT,
-  `adress_street` varchar(512) NOT NULL,
-  `adress_number` varchar(32) NOT NULL COMMENT 'storing as text to allow suffixes etc.',
-  `adress_postalcode` varchar(64) NOT NULL,
-  `adress_city` varchar(512) NOT NULL,
-  `adress_province` varchar(512) NOT NULL,
-  `adress_country` int(3) NOT NULL COMMENT 'ISO 3166-1 numeric',
-  PRIMARY KEY (`adress_id`),
-  KEY `adress_country` (`adress_country`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+CREATE TABLE `address` (
+  `address_id` int(11) NOT NULL,
+  `address_street` varchar(512) NOT NULL,
+  `address_number` varchar(32) NOT NULL COMMENT 'storing as text to allow suffixes etc.',
+  `address_postalcode` varchar(64) NOT NULL,
+  `address_city` varchar(512) NOT NULL,
+  `address_province` varchar(512) NOT NULL,
+  `address_country` char(2) NOT NULL COMMENT 'ISO 3166-1 alpha2'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `capability`
+--
+
+CREATE TABLE `capability` (
+  `capability_id` int(11) NOT NULL,
+  `capability_name` varchar(16) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -44,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `address` (
 -- Table structure for table `country`
 --
 
-CREATE TABLE IF NOT EXISTS `country` (
+CREATE TABLE `country` (
   `code` int(3) NOT NULL,
   `alpha2` varchar(2) NOT NULL,
   `alpha3` varchar(3) NOT NULL,
@@ -54,10 +64,7 @@ CREATE TABLE IF NOT EXISTS `country` (
   `langES` varchar(45) NOT NULL,
   `langFR` varchar(45) NOT NULL,
   `langIT` varchar(45) NOT NULL,
-  `langNL` varchar(45) NOT NULL,
-  PRIMARY KEY (`code`),
-  UNIQUE KEY `alpha2` (`alpha2`),
-  UNIQUE KEY `alpha3` (`alpha3`)
+  `langNL` varchar(45) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='https://github.com/armetiz/SQL-Countries-ISO-3166-1';
 
 --
@@ -313,12 +320,10 @@ INSERT INTO `country` (`code`, `alpha2`, `alpha3`, `langCS`, `langDE`, `langEN`,
 -- Table structure for table `country_vies`
 --
 
-CREATE TABLE IF NOT EXISTS `country_vies` (
-  `country_vies_id` int(11) NOT NULL AUTO_INCREMENT,
-  `alpha2` varchar(2) DEFAULT NULL,
-  PRIMARY KEY (`country_vies_id`),
-  KEY `alpha2` (`alpha2`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=31 ;
+CREATE TABLE `country_vies` (
+  `country_vies_id` int(11) NOT NULL,
+  `alpha2` varchar(2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `country_vies`
@@ -360,41 +365,47 @@ INSERT INTO `country_vies` (`country_vies_id`, `alpha2`) VALUES
 -- Table structure for table `customer`
 --
 
-CREATE TABLE IF NOT EXISTS `customer` (
-  `customer_id` int(11) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`customer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+CREATE TABLE `customer` (
+  `customer_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `entity`
+-- Table structure for table `email`
 --
 
-CREATE TABLE IF NOT EXISTS `entity` (
-  `entity_id` int(11) NOT NULL AUTO_INCREMENT,
-  `entity_name` varchar(512) NOT NULL,
-  `entity_type` enum('unregged','association','foundation','company','other') NOT NULL,
-  `entity_vat` varchar(128) NOT NULL COMMENT 'EU vat number',
-  `entity_nl_kvk` int(11) NOT NULL COMMENT 'Dutch KvK nummer',
-  `entity_country` int(3) NOT NULL COMMENT 'ISO 3166-1 numeric',
-  PRIMARY KEY (`entity_id`),
-  KEY `entity_name` (`entity_name`(191),`entity_vat`),
-  KEY `entity_country` (`entity_country`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+CREATE TABLE `email` (
+  `email_id` int(11) NOT NULL,
+  `email_address` varchar(256) NOT NULL,
+  `email_verified` tinyint(1) NOT NULL DEFAULT '0',
+  `email_verification` char(40) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `link_customer2entity`
+-- Table structure for table `link_address2organisation`
 --
 
-CREATE TABLE IF NOT EXISTS `link_customer2entity` (
-  `link_customer2entity_id` int(11) NOT NULL AUTO_INCREMENT,
-  `entity_id` int(11) NOT NULL,
-  PRIMARY KEY (`link_customer2entity_id`),
-  UNIQUE KEY `entity_id` (`entity_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+CREATE TABLE `link_address2organisation` (
+  `link_address2organisation_id` int(11) NOT NULL,
+  `address_id` int(11) NOT NULL,
+  `organisation_id` int(11) NOT NULL,
+  `address_type` enum('general','billing','visiting','validated','') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `link_customer2organisation`
+--
+
+CREATE TABLE `link_customer2organisation` (
+  `link_customer2organisation_id` int(11) NOT NULL,
+  `organisation_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -402,28 +413,62 @@ CREATE TABLE IF NOT EXISTS `link_customer2entity` (
 -- Table structure for table `link_customer2person`
 --
 
-CREATE TABLE IF NOT EXISTS `link_customer2person` (
+CREATE TABLE `link_customer2person` (
   `link_customer2person_id` int(11) NOT NULL,
   `customer_id` int(11) NOT NULL,
-  `person_id` int(11) NOT NULL,
-  KEY `customer_id` (`customer_id`),
-  KEY `person_id` (`person_id`)
+  `person_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `link_project2customer`
+-- Table structure for table `link_customer2project`
 --
 
-CREATE TABLE IF NOT EXISTS `link_project2customer` (
-  `link_project2entity_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `link_customer2project` (
+  `link_project2organisation_id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
-  `customer_id` int(11) NOT NULL,
-  PRIMARY KEY (`link_project2entity_id`),
-  KEY `project_id` (`project_id`,`customer_id`),
-  KEY `entity_id` (`customer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+  `customer_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `link_email2user`
+--
+
+CREATE TABLE `link_email2user` (
+  `link_email2user_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `email_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `link_session2user`
+--
+
+CREATE TABLE `link_session2user` (
+  `link_session2user_id` int(11) NOT NULL,
+  `session_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `organisation`
+--
+
+CREATE TABLE `organisation` (
+  `organisation_id` int(11) NOT NULL,
+  `organisation_name` varchar(512) NOT NULL,
+  `organisation_type` enum('association_unregged','association_regged','foundation','company','other') NOT NULL,
+  `organisation_vat` varchar(128) NOT NULL COMMENT 'EU vat number',
+  `organisation_nl_kvk` int(11) NOT NULL COMMENT 'Dutch KvK nummer',
+  `organisation_country` varchar(2) NOT NULL COMMENT 'ISO 3166-1 alpha2'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -431,15 +476,13 @@ CREATE TABLE IF NOT EXISTS `link_project2customer` (
 -- Table structure for table `person`
 --
 
-CREATE TABLE IF NOT EXISTS `person` (
-  `person_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `person` (
+  `person_id` int(11) NOT NULL,
   `person_first_name` varchar(256) NOT NULL COMMENT 'voornaam',
   `person_initials` varchar(16) NOT NULL COMMENT 'voorletters',
   `person_last_name_prefix` varchar(16) NOT NULL COMMENT 'tussenvoegsel',
-  `person_last_name` varchar(256) NOT NULL COMMENT 'achternaam',
-  PRIMARY KEY (`person_id`),
-  KEY `first_name` (`person_first_name`(191),`person_last_name`(191))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+  `person_last_name` varchar(256) NOT NULL COMMENT 'achternaam'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -447,16 +490,15 @@ CREATE TABLE IF NOT EXISTS `person` (
 -- Table structure for table `project`
 --
 
-CREATE TABLE IF NOT EXISTS `project` (
-  `project_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `project` (
+  `project_id` int(11) NOT NULL,
   `project_description_short` varchar(128) NOT NULL,
   `project_description_long` varchar(2048) NOT NULL,
   `project_billing_rate` int(11) NOT NULL COMMENT 'smallest unit in currency (cents)',
   `project_billing_currency` char(3) NOT NULL DEFAULT 'EUR',
-  `project_billing_type` enum('hourly','fixed','','') NOT NULL DEFAULT 'hourly',
-  `project_status` enum('planned','running','finished','') NOT NULL,
-  PRIMARY KEY (`project_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+  `project_billing_type` enum('timed','fixed') NOT NULL DEFAULT 'timed',
+  `project_status` enum('planned','running','finished','') NOT NULL DEFAULT 'planned'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -464,42 +506,278 @@ CREATE TABLE IF NOT EXISTS `project` (
 -- Table structure for table `project_hours`
 --
 
-CREATE TABLE IF NOT EXISTS `project_hours` (
-  `project_hours_id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `project_hours` (
+  `project_hours_id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
-  `day` int(2) NOT NULL,
-  `month` int(2) NOT NULL,
-  `year` int(4) NOT NULL,
-  `hours` int(2) NOT NULL,
-  `quarters` int(1) NOT NULL,
-  `project_hours_billed` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`project_hours_id`),
-  KEY `project_id` (`project_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+  `project_hours_date` date NOT NULL,
+  `project_hours_hours` int(2) NOT NULL,
+  `project_hours_quarters` int(1) NOT NULL,
+  `project_hours_billable` tinyint(1) NOT NULL DEFAULT '1',
+  `project_hours_billed` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `session`
+--
+
+CREATE TABLE `session` (
+  `session_id` int(11) NOT NULL,
+  `session_hash` char(40) NOT NULL,
+  `session_start` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `session_ip_start` binary(16) NOT NULL,
+  `session_ip_last` binary(16) NOT NULL,
+  `session_ip_locked` tinyint(1) NOT NULL DEFAULT '0',
+  `session_useragent` varchar(512) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+CREATE TABLE `user` (
+  `user_id` int(11) NOT NULL,
+  `user_pbkdf2` char(77) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `address`
+--
+ALTER TABLE `address`
+  ADD PRIMARY KEY (`address_id`),
+  ADD KEY `adress_country` (`address_country`);
+
+--
+-- Indexes for table `capability`
+--
+ALTER TABLE `capability`
+  ADD PRIMARY KEY (`capability_id`),
+  ADD KEY `capability_name` (`capability_name`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `country`
+--
+ALTER TABLE `country`
+  ADD PRIMARY KEY (`code`),
+  ADD UNIQUE KEY `alpha2` (`alpha2`),
+  ADD UNIQUE KEY `alpha3` (`alpha3`);
+
+--
+-- Indexes for table `country_vies`
+--
+ALTER TABLE `country_vies`
+  ADD PRIMARY KEY (`country_vies_id`),
+  ADD KEY `alpha2` (`alpha2`);
+
+--
+-- Indexes for table `customer`
+--
+ALTER TABLE `customer`
+  ADD PRIMARY KEY (`customer_id`);
+
+--
+-- Indexes for table `email`
+--
+ALTER TABLE `email`
+  ADD PRIMARY KEY (`email_id`);
+
+--
+-- Indexes for table `link_address2organisation`
+--
+ALTER TABLE `link_address2organisation`
+  ADD PRIMARY KEY (`link_address2organisation_id`);
+
+--
+-- Indexes for table `link_customer2organisation`
+--
+ALTER TABLE `link_customer2organisation`
+  ADD PRIMARY KEY (`link_customer2organisation_id`),
+  ADD UNIQUE KEY `organisation_id` (`organisation_id`),
+  ADD KEY `customer_id` (`customer_id`);
+
+--
+-- Indexes for table `link_customer2person`
+--
+ALTER TABLE `link_customer2person`
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `person_id` (`person_id`);
+
+--
+-- Indexes for table `link_customer2project`
+--
+ALTER TABLE `link_customer2project`
+  ADD PRIMARY KEY (`link_project2organisation_id`),
+  ADD KEY `project_id` (`project_id`,`customer_id`),
+  ADD KEY `organisation_id` (`customer_id`);
+
+--
+-- Indexes for table `link_email2user`
+--
+ALTER TABLE `link_email2user`
+  ADD PRIMARY KEY (`link_email2user_id`);
+
+--
+-- Indexes for table `link_session2user`
+--
+ALTER TABLE `link_session2user`
+  ADD PRIMARY KEY (`link_session2user_id`);
+
+--
+-- Indexes for table `organisation`
+--
+ALTER TABLE `organisation`
+  ADD PRIMARY KEY (`organisation_id`),
+  ADD KEY `organisation_name` (`organisation_name`(191),`organisation_vat`),
+  ADD KEY `organisation_country` (`organisation_country`);
+
+--
+-- Indexes for table `person`
+--
+ALTER TABLE `person`
+  ADD PRIMARY KEY (`person_id`),
+  ADD KEY `first_name` (`person_first_name`(191),`person_last_name`(191));
+
+--
+-- Indexes for table `project`
+--
+ALTER TABLE `project`
+  ADD PRIMARY KEY (`project_id`);
+
+--
+-- Indexes for table `project_hours`
+--
+ALTER TABLE `project_hours`
+  ADD PRIMARY KEY (`project_hours_id`),
+  ADD KEY `project_id` (`project_id`);
+
+--
+-- Indexes for table `session`
+--
+ALTER TABLE `session`
+  ADD PRIMARY KEY (`session_id`),
+  ADD KEY `session_hash` (`session_hash`);
+
+--
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`user_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `address`
+--
+ALTER TABLE `address`
+  MODIFY `address_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+--
+-- AUTO_INCREMENT for table `capability`
+--
+ALTER TABLE `capability`
+  MODIFY `capability_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT for table `country_vies`
+--
+ALTER TABLE `country_vies`
+  MODIFY `country_vies_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+--
+-- AUTO_INCREMENT for table `customer`
+--
+ALTER TABLE `customer`
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+--
+-- AUTO_INCREMENT for table `email`
+--
+ALTER TABLE `email`
+  MODIFY `email_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+--
+-- AUTO_INCREMENT for table `link_address2organisation`
+--
+ALTER TABLE `link_address2organisation`
+  MODIFY `link_address2organisation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+--
+-- AUTO_INCREMENT for table `link_customer2organisation`
+--
+ALTER TABLE `link_customer2organisation`
+  MODIFY `link_customer2organisation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+--
+-- AUTO_INCREMENT for table `link_customer2project`
+--
+ALTER TABLE `link_customer2project`
+  MODIFY `link_project2organisation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT for table `link_email2user`
+--
+ALTER TABLE `link_email2user`
+  MODIFY `link_email2user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT for table `link_session2user`
+--
+ALTER TABLE `link_session2user`
+  MODIFY `link_session2user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+--
+-- AUTO_INCREMENT for table `organisation`
+--
+ALTER TABLE `organisation`
+  MODIFY `organisation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+--
+-- AUTO_INCREMENT for table `person`
+--
+ALTER TABLE `person`
+  MODIFY `person_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+--
+-- AUTO_INCREMENT for table `project`
+--
+ALTER TABLE `project`
+  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+--
+-- AUTO_INCREMENT for table `project_hours`
+--
+ALTER TABLE `project_hours`
+  MODIFY `project_hours_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+--
+-- AUTO_INCREMENT for table `session`
+--
+ALTER TABLE `session`
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `link_customer2entity`
+-- Constraints for table `link_customer2organisation`
 --
-ALTER TABLE `link_customer2entity`
-  ADD CONSTRAINT `link_customer2entity_ibfk_1` FOREIGN KEY (`entity_id`) REFERENCES `entity` (`entity_id`);
+ALTER TABLE `link_customer2organisation`
+  ADD CONSTRAINT `link_customer2organisation_ibfk_1` FOREIGN KEY (`organisation_id`) REFERENCES `organisation` (`organisation_id`);
 
 --
 -- Constraints for table `link_customer2person`
 --
 ALTER TABLE `link_customer2person`
-  ADD CONSTRAINT `link_customer2person_ibfk_2` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`),
-  ADD CONSTRAINT `link_customer2person_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`);
+  ADD CONSTRAINT `link_customer2person_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
+  ADD CONSTRAINT `link_customer2person_ibfk_2` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`);
 
 --
--- Constraints for table `link_project2customer`
+-- Constraints for table `link_customer2project`
 --
-ALTER TABLE `link_project2customer`
-  ADD CONSTRAINT `link_project2customer_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
-  ADD CONSTRAINT `link_project2customer_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+ALTER TABLE `link_customer2project`
+  ADD CONSTRAINT `link_customer2project_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`),
+  ADD CONSTRAINT `link_customer2project_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`);
 
 --
 -- Constraints for table `project_hours`
