@@ -63,9 +63,7 @@ echo "<pre>" . var_export($loginData,true) . "</pre>";
      if ($validPassword) {
        echo "password valid, creating session";
        $data = array();
-       //$data[":session_hash"]=sha1(mcrypt_create_iv(16));
-       //mcrypt_create_iv(16) caused a hang on production server
-       $data[":session_hash"]=sha1(rand());
+       $data[":session_hash"]=sha1(mcrypt_create_iv(16), MCRYPT_DEV_URANDOM);
        if (strstr($_SERVER['REMOTE_ADDR'],":")) {
          // Remote address is IPv6 or IPv4 in IPv6 notation
          $data[":session_ip_start"] =inet_pton($_SERVER['REMOTE_ADDR']);
@@ -80,7 +78,10 @@ echo "<pre>" . var_export($loginData,true) . "</pre>";
        if(!$sth->execute($data)) {
          //todo: error handling
        } 
-       setcookie("ItPhilManagerSession", $data[":session_hash"] , PHP_INT_MAX); // set cookie
+       setcookie("ItPhilManagerSession", $data[":session_hash"] , 2147483647 ) //PHP_INT_MAX); 
+       // PHP_MAX_INT causes problem on production server:
+       // PHP Warning:  Expiry date cannot have a year greater than 9999 
+       // and does not set cookie. I suppose using the max 32 bit value solves the problem.... until 2038
        $data = array();
        $data[':session_id'] = $pdo->lastInsertId();
        $data[':user_id'] =  $user_id;
