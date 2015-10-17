@@ -6,6 +6,8 @@ require_once("base/Philosopher.php");
 
 $stone = new Philosopher\Stone();
 $stone->registerComponent(new Philosopher\AuthSession());
+$stone->registerComponent(new Philosopher\RenderHTML5());
+$stone->processRequest();
 
-echo "<pre>" . var_export($stone,true) . "</pre>";
+
 ?>

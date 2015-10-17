@@ -35,6 +35,10 @@ namespace Philosopher;
 
 class Stone {
   private $_components = array();
+
+  private $_renders    = array();
+  private $_auths      = array();
+
   private $_errors     = array();
 
   public function registerComponent($component) {
@@ -42,6 +46,10 @@ class Stone {
     try {
       $component->load($this);
       $this->_components[] = $component; 
+
+      if ($component instanceof Render) $this->_renders[] = $component;
+      if ($component instanceof Auth) $this->_auths[] = $component;
+
       return true;
     } catch (\Exception $e) {
       $_errors[]=$e;
@@ -50,7 +58,13 @@ class Stone {
   }
 
   public function processRequest(){
-
+    //$this->_components[0]->resume(); // test // TODO: database support
+    $data=array();
+    $data['title']="The IT Philosopher - Manager";
+    $data['content_right_raw'] .= "This is right!";
+    $data['content_raw'] .= "Hello world!";
+    $data['menu']=array();  
+    $this->_renders[0]->render($data);
   }
 
 }

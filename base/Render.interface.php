@@ -30,33 +30,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-/*
-    // Your custom class dir
-    define('CLASS_DIR', __DIR__ .'/');
+interface Render {
 
-    // Add your class dir to include path
-    set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
+  function render($data);
 
-    // You can use this trick to make autoloader look for commonly used "My.class.php" type filenames
-    spl_autoload_extensions('.class.php');
-
-    // Use default autoload implementation
-*/
-    spl_autoload_register();
-
-    function classLoader($classname) {
-      $classname = str_replace("Philosopher\\","",$classname);
-      include ( __DIR__ . "/$classname.class.php") ;
-    }
-
-    function interfaceLoader($classname) {
-      $classname = str_replace("Philosopher\\","",$classname);
-      include ( __DIR__ . "/$classname.interface.php") ;
-    }
-
-
-    spl_autoload_register('Philosopher\classLoader');
-    spl_autoload_register('Philosopher\interfaceLoader');
-
+}
 
 ?>

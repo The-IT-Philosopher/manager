@@ -30,33 +30,32 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-/*
-    // Your custom class dir
-    define('CLASS_DIR', __DIR__ .'/');
+class RenderHTML5 extends Component implements Render {
 
-    // Add your class dir to include path
-    set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
+  public const Content-Type    = "text/html";
+  public const DefaultPriority = 10;
 
-    // You can use this trick to make autoloader look for commonly used "My.class.php" type filenames
-    spl_autoload_extensions('.class.php');
+  function render($data) {
+    $output = file_get_contents(__DIR__."/template/index.tpl");
 
-    // Use default autoload implementation
-*/
-    spl_autoload_register();
+    $template_url = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__."/template/");
+    $output = str_replace("{template_path}",$template_url,$output);
+    $output = str_replace("{main_center}",$data['content_raw'],$output);
+    $output = str_replace("{html_title}",$data['title'], $output);   
 
-    function classLoader($classname) {
-      $classname = str_replace("Philosopher\\","",$classname);
-      include ( __DIR__ . "/$classname.class.php") ;
+    $output = str_replace("{main_right}",$data['content_right_raw'],$output);
+
+ 
+    $menu = "";
+    foreach ($data['menu'] as $menuItem) {
+      $menu .= "<a href=/" .$menuItem['slug'] ."><button>". $menuItem['title'] . "</button></a><br>";
     }
-
-    function interfaceLoader($classname) {
-      $classname = str_replace("Philosopher\\","",$classname);
-      include ( __DIR__ . "/$classname.interface.php") ;
-    }
+    $output = str_replace("{main_left}",$menu,$output);
 
 
-    spl_autoload_register('Philosopher\classLoader');
-    spl_autoload_register('Philosopher\interfaceLoader');
+    echo $output;
+  }
 
+}
 
 ?>

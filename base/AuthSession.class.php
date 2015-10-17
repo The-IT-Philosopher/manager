@@ -32,10 +32,6 @@ namespace Philosopher;
 
 class AuthSession extends Component {
 
-  function test() {
-    $this->stone->smoke();
-  }
-
   function resume() {
   if (isset($_COOKIE['ItPhilManagerSession'])) {
     $sth = $this->pdo->prepare("SELECT user.user_id as user_id from user
@@ -55,10 +51,13 @@ class AuthSession extends Component {
       $capabilities = array();
       while ($capability=$sth->fetchColumn()) $capabilities[]=$capability;
       $_SESSION['user']['capabilities'] = $capabilities;
-      return;
-      } else {
+      return true;
+      } else { // invalid or ended session 
         setcookie(ItPhilManagerSession, "" , 1); //unsetting cookie
+        return false;
       }
+    } else { // no cookie set
+      return false;
     }
   }
 
