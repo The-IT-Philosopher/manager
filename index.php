@@ -12,11 +12,10 @@ $renderer = new Renderer();
 $request = explode("/", $_SERVER['REQUEST_URI']);
 array_shift($request);
 $data = array();
-$data['title']="test";
-$data['content_raw']  = "<h3>Hello World!</h3>";
+$data['title']="The IT Philosopher - Manager";
 
 
-    $data['content_raw'] .= "<pre>" . var_export($request,true) . "</pre>";
+    $data['content_right_raw'] .= "<pre>REQUEST\n" . var_export($request,true) . "</pre>";
 
 if (!isset($_SESSION['user'])) {
   $data['content_raw'] .= "<h2>Login Required</h2>";
@@ -65,13 +64,15 @@ if (isset($_SESSION['user'])) {
 }
 
 if (isset($errors)) {
-  echo "processing errors<br>";
+  //echo "processing errors<br>";
   foreach ($errors as $error) {
-    $data['content_raw'] .= "ERRORS:<pre>" . var_export($error,true) . "</pre>";
+    $data['content_right_raw'] .= "ERRORS:<pre>" . var_export($error,true) . "</pre>";
   }
-} else echo "no errors set<br>";
-//$data['content_raw'] .= "<br><table><tr><td>SERVER<br><pre>" . var_export($_SERVER,true) . "</pre></td><td>POST<br><pre>" . var_export($_POST,true) . "</pre>SESSION<br><pre>" . var_export($_SESSION,true) . "</pre></td></tr></table>";
-$data['content_raw'] .= "<td>POST<br><pre>" . var_export($_POST,true) . "</pre>SESSION<br><pre>" . var_export($_SESSION,true) . "</pre></td></tr></table>";
+} //else echo "no errors set<br>";
+//$data['content_raw'] .= "<br><table><tr><td><pre>SERVER\n" . var_export($_SERVER,true) . "</pre></td><td>POST<br><pre>" . var_export($_POST,true) . "</pre><pre>SESSION\n" . var_export($_SESSION,true) . "</pre></td></tr></table>";
+$data['content_right_raw'] .= "<pre>POST\n" . var_export($_POST,true) . "</pre><pre>SESSION\n" . var_export($_SESSION,true) . "</pre>";
+
+$data['content_raw'] .= "</td></tr></table>";
 
 $renderer->render($data);
 ?>

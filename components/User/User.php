@@ -17,7 +17,7 @@ class User {
   function ProcessLogin(){
     global $pdo;
     if (isset($_COOKIE['ItPhilManagerSession'])) {
-      echo "checking session for ".$_COOKIE['ItPhilManagerSession']."<br>";
+      //echo "checking session for ".$_COOKIE['ItPhilManagerSession']."<br>";
       $sth = $pdo->prepare("SELECT user.user_id as user_id from user
                             JOIN link_session2user
                             ON link_session2user.user_id = user.user_id
@@ -31,7 +31,7 @@ class User {
         $_SESSION['user']['id']=$user_id;
         $sth = $pdo->prepare("SELECT capability_name FROM capability WHERE user_id = :user_id");
         $sth->execute(array(":user_id"=> $user_id));
-        echo "ERRIR (udi $user_id <pre>" . var_export( $sth->errorInfo() , true ) . "</pre>";
+        //echo "ERRIR (udi $user_id <pre>" . var_export( $sth->errorInfo() , true ) . "</pre>";
         //$capabilities = $sth->fetchAll(PDO::FETCH_ASSOC|PDO::FETCH_GROUP); //not quite the desired result
         $capabilities = array();
         while ($capability=$sth->fetchColumn())$capabilities[]=$capability;
@@ -57,13 +57,17 @@ class User {
      $dbHash = $loginData['user_pbkdf2'];
      $user_id = $loginData['user_id'];
 //DEBUG
-echo "<pre>" . var_export($loginData,true) . "</pre>";
+//echo "<pre>" . var_export($loginData,true) . "</pre>";
 //DEBUG     
      $validPassword = $hasher->validate_password($_POST['password'], $dbHash);
      if ($validPassword) {
-       echo "password valid, creating session";
+        $_SESSION['user']=array();
+        $_SESSION['user']['id']=$user_id;
+       //echo "password valid, creating session";
        $data = array();
-       $data[":session_hash"]=sha1(mcrypt_create_iv(16), MCRYPT_DEV_URANDOM);
+       //$data[":session_hash"]=sha1(mcrypt_create_iv(16), MCRYPT_DEV_URANDOM);
+       // even with URANDOM, it hangs, production server appears to have little entropy // is this really the case???
+       $data[":session_hash"]=sha1(rand()); //TODO: something better as a session hash!
        if (strstr($_SERVER['REMOTE_ADDR'],":")) {
          // Remote address is IPv6 or IPv4 in IPv6 notation
          $data[":session_ip_start"] =inet_pton($_SERVER['REMOTE_ADDR']);
@@ -82,6 +86,7 @@ echo "<pre>" . var_export($loginData,true) . "</pre>";
        // PHP_MAX_INT causes problem on production server:
        // PHP Warning:  Expiry date cannot have a year greater than 9999 
        // and does not set cookie. I suppose using the max 32 bit value solves the problem.... until 2038
+       // (This problem occurs on 64 bit PHP installations)
        $data = array();
        $data[':session_id'] = $pdo->lastInsertId();
        $data[':user_id'] =  $user_id;
@@ -89,11 +94,11 @@ echo "<pre>" . var_export($loginData,true) . "</pre>";
        if(!$sth->execute($data)) {
          //todo: error handling
        }
-       
+              
        
        
      } else {
-      echo "Invalid PasswordQ";
+      $data['content_raw'] .= "Invalid Password";
      }
   }
 

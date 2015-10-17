@@ -89,7 +89,7 @@ class Customer {
           $_SESSION['CustomerAddWizard']['personId'] = $person_id;
           if (strlen($_POST['email_address'])) {
             $insertData = array();
-            $insertData[":email_verification"]=sha1(mcrypt_create_iv(16)); 
+            $insertData[":email_verification"]=sha1(mcrypt_create_iv(16), MCRYPT_DEV_URANDOM ); 
             $insertData[":email_address"]=$_POST['email_address'];
             $sth = $pdo->prepare("INSERT INTO email (email_address,email_verification) VALUES (:email_address,:email_verification)");
             $sth->execute($insertData);
