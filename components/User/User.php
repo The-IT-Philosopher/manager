@@ -17,7 +17,6 @@ class User {
   function ProcessLogin(){
     global $pdo;
     if (isset($_COOKIE['ItPhilManagerSession'])) {
-      //echo "checking session for ".$_COOKIE['ItPhilManagerSession']."<br>";
       $sth = $pdo->prepare("SELECT user.user_id as user_id from user
                             JOIN link_session2user
                             ON link_session2user.user_id = user.user_id
