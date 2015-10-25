@@ -78,6 +78,20 @@ html {
   .container .center { width: 600px; }
 }
 
+
+@media screen and (min-width: 1000px) and (max-width: 1099px) {
+  .container .center { width: 500px; }
+}
+
+@media screen and (min-width: 900px) and (max-width: 999px) {
+  .container .center { width: 500px; }
+}
+
+/* 980 */
+@media screen and (min-width: 980px) and (max-width: 980px) {
+  html { color : red; } /* some weird android case */
+} /* solved: viewport & initial zoom in meta tag */ 
+
 @media screen and (min-width: 1200px) {
   .left, .right { width:200px; }
   .header * img.logo, .header * .title  { height: 150px; }
@@ -95,6 +109,58 @@ html {
   .header * .title .slogan { font-size: 18px; }
 }
 
-// TODO
+
+@media screen and (min-width: 1000px) and (max-width: 1099px) {
+  .left, .right { width:175px; }
+  .header * img.logo, .header * .title  { height: 115px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 31px; }
+  .header * .title .slogan { font-size: 18px; }
+}
+
+
+@media screen and (min-width: 900px) and (max-width: 999px) {
+  .left, .right { width:150px; }
+  .header * img.logo, .header * .title  { height: 105px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 28px; }
+  .header * .title .slogan { font-size: 16px; }
+}
+
+@media screen and (min-width: 800px) and (max-width: 899px) {
+  .left, .right { width:150px; }
+  .header * img.logo, .header * .title  { height: 105px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 28px; }
+  .header * .title .slogan { font-size: 16px; }
+}
+
+
+
+@media screen and (min-width: 600px) and (max-width: 699px) {
+  /* we need different values, but just to be sure this is selected now */ 
+  .left, .right { width:150px; }
+  .header * img.logo, .header * .title  { height: 105px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 28px; }
+  .header * .title .slogan { font-size: 16px; }
+}
+
+
+@supports (touch-action: auto) {
+  /* Detect mobile device using css only */
+  /* experimental technology */
+  /* Microsoft Edge on a non-touch device also triggers this */
+  body { color : blue; }
+  /* Use @import and allow other cases to import it as well
+     That should be the default for any case above anyways
+  */
+}
+
+/*  TODO */
 @supports (display: flex) {}
 @supports not (display: flex) {}
+
+
+/* DEBUGGING */
+.right { width:500px; }

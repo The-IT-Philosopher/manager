@@ -32,41 +32,24 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-class Wizard extends Component {
-  private $_current_page = array();
-  private $_pages = array();
+class KvK_Wizard extends Component {
+
+  private $_donePage = "done";
+
   
-  public function render() {
-    // STUB
-    $this->stone->_data['content_raw'] .= "rendering...";    
-    $this->stone->_data['content_raw'] .= $this->_current_page['content_raw'];
+  function init() {
+    $this->stone->_data['content_raw'] .= "Attemting to add kvk wizard"; 
+    $this->stone->_wizard->registerPage(
+      array("kvk_enter_form"=>array('content_raw'=> "HTMLFORM", "process" => "KvK_Wizard::process")));
   }
 
-  public function process() {
-    $result = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['process']);
-    if (isset($result['next_page'])) {
-      if (isset($this->_pages[$result['next_page']])) {
-        $this->_current_page = $this->_pages[$result['next_page']];
-      } else {
-        //page not found
-      }
-    }
+  function setDonePage($donepage) {
+    $this->_donePage=$donepage;
   }
 
-  public function setPage($page) {
-    if (isset($this->_pages[$page])) {
-      $this->_current_page = $this->_pages[$page];
-          $this->stone->_data['content_raw'] .= "Page $page set<br>"; 
-    } else {
-      //page not found
-          $this->stone->_data['content_raw'] .= "Page $page not found<br>"; 
-    }
+  function process() {
+    return array();
   }
 
-  public function registerPage($page) {
-        $this->stone->_data['content_raw'] .= "Page " . key($page) . "added<br>"; 
-    $this->_pages=array_merge($this->_pages,$page);
-  }
-  
+
 }
-?>

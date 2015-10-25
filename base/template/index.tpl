@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset=utf-8>
+    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- make Android behave -->
     <title>{html_title}</title>
     <link rel="stylesheet" href="{template_path}/style.css">
     <!-- 
@@ -13,10 +14,8 @@
   <body>
     <div class="container header">
       <div class="left">
-        Mobiel<br>Simple HTML<br><b>Live HTML</b>
+        {top_left}
       </div>
-      
-
       <div class="center">
         <div class="container">
           <div class="spacer"></div>
@@ -31,7 +30,7 @@
         </div>
       </div>
       <div class="right">
-        <div class="language"><b>Nederlands</b><br>English<br>Deutsch</div>
+        {top_right}
       </div>
     </div>
 

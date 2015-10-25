@@ -34,7 +34,7 @@ class AuthSession extends Component {
 
   function resume() {
   if (isset($_COOKIE['ItPhilManagerSession'])) {
-    $sth = $this->pdo->prepare("SELECT user.user_id as user_id from user
+    $sth = $this->stone->pdo->prepare("SELECT user.user_id as user_id from user
                           JOIN link_session2user
                           ON link_session2user.user_id = user.user_id
                           JOIN session
@@ -44,13 +44,13 @@ class AuthSession extends Component {
     $user_id = $sth->fetchColumn();
     if ($user_id) {
       $this->stone->setUserID($user_id);
-      $sth = $this->pdo->prepare("SELECT capability_name 
+      $sth = $this->stone->pdo->prepare("SELECT capability_name 
                             FROM capability 
                               WHERE user_id = :user_id");
       $sth->execute(array(":user_id"=> $user_id));
       $capabilities = array();
       while ($capability=$sth->fetchColumn()) $capabilities[]=$capability;
-      $_SESSION['user']['capabilities'] = $capabilities;
+      $this->stone->setUserCapabilities($capabilities);
       return true;
       } else { // invalid or ended session 
         setcookie(ItPhilManagerSession, "" , 1); //unsetting cookie
@@ -72,7 +72,7 @@ class AuthSession extends Component {
       $data[":session_ip_start"] = inet_pton("::ffff:".$_SERVER['REMOTE_ADDR']);
     }
     $data[":session_useragent"] = $_SERVER['HTTP_USER_AGENT'];
-    $sth = $this->pdo->prepare("INSERT INTO session 
+    $sth = $this->stone->pdo->prepare("INSERT INTO session 
                                (session_hash,session_ip_start,session_useragent)
                   values (:session_hash,:session_ip_start,:session_useragent)");
     if(!$sth->execute($data)) {
@@ -82,9 +82,9 @@ class AuthSession extends Component {
     // to prevent year 2038 problems.
     setcookie("ItPhilManagerSession", $data[":session_hash"] , 2147483647 );
     $data = array();
-    $data[':session_id'] = $this->pdo->lastInsertId();
+    $data[':session_id'] = $this->stone->pdo->lastInsertId();
     $data[':user_id'] =  $user_id;
-    $sth = $this->pdo->prepare("INSERT INTO link_session2user 
+    $sth = $this->stone->pdo->prepare("INSERT INTO link_session2user 
                                        (session_id,user_id) 
                                 VALUES (:session_id,:user_id)");
     if(!$sth->execute($data)) {

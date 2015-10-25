@@ -28,45 +28,24 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
 */
 
-
-
 namespace Philosopher;
 
-class Wizard extends Component {
-  private $_current_page = array();
-  private $_pages = array();
+class RenderXML extends Component implements Render {
+
+   const ContentType    = "application/xml";
+   const DefaultCharset  = "UTF-8";
+   const DefaultPriority = 10;
   
-  public function render() {
-    // STUB
-    $this->stone->_data['content_raw'] .= "rendering...";    
-    $this->stone->_data['content_raw'] .= $this->_current_page['content_raw'];
+  //stub
+  function render($data) {
+    header("Content-Type: application/xml");
+    $xml = new \SimpleXMLElement('<root/>');
+    array_walk_recursive(array_flip($data), array ($xml, 'addChild'));
+    print $xml->asXML();
   }
 
-  public function process() {
-    $result = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['process']);
-    if (isset($result['next_page'])) {
-      if (isset($this->_pages[$result['next_page']])) {
-        $this->_current_page = $this->_pages[$result['next_page']];
-      } else {
-        //page not found
-      }
-    }
-  }
 
-  public function setPage($page) {
-    if (isset($this->_pages[$page])) {
-      $this->_current_page = $this->_pages[$page];
-          $this->stone->_data['content_raw'] .= "Page $page set<br>"; 
-    } else {
-      //page not found
-          $this->stone->_data['content_raw'] .= "Page $page not found<br>"; 
-    }
-  }
 
-  public function registerPage($page) {
-        $this->stone->_data['content_raw'] .= "Page " . key($page) . "added<br>"; 
-    $this->_pages=array_merge($this->_pages,$page);
-  }
-  
 }
+
 ?>

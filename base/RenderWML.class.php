@@ -28,45 +28,25 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
 */
 
-
-
 namespace Philosopher;
 
-class Wizard extends Component {
-  private $_current_page = array();
-  private $_pages = array();
+class RenderJSON extends Component implements Render {
+
+   const ContentType    = "text/vnd.wap.wml";
+   const DefaultCharset  = "UTF-8";
+   const DefaultPriority = 10;
   
-  public function render() {
+
+  function render($data) {
     // STUB
-    $this->stone->_data['content_raw'] .= "rendering...";    
-    $this->stone->_data['content_raw'] .= $this->_current_page['content_raw'];
+    header("Content-Type: text/vnd.wap.wml");
+    echo '<?xml version="1.0" encoding="utf-8"?>';
+    echo '<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.3//EN" 
+                                      "http://www.wapforum.org/DTD/wml13.dtd">';
+    echo "<wml></wml>";
   }
 
-  public function process() {
-    $result = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['process']);
-    if (isset($result['next_page'])) {
-      if (isset($this->_pages[$result['next_page']])) {
-        $this->_current_page = $this->_pages[$result['next_page']];
-      } else {
-        //page not found
-      }
-    }
-  }
 
-  public function setPage($page) {
-    if (isset($this->_pages[$page])) {
-      $this->_current_page = $this->_pages[$page];
-          $this->stone->_data['content_raw'] .= "Page $page set<br>"; 
-    } else {
-      //page not found
-          $this->stone->_data['content_raw'] .= "Page $page not found<br>"; 
-    }
-  }
-
-  public function registerPage($page) {
-        $this->stone->_data['content_raw'] .= "Page " . key($page) . "added<br>"; 
-    $this->_pages=array_merge($this->_pages,$page);
-  }
-  
 }
+
 ?>

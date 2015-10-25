@@ -32,9 +32,11 @@ namespace Philosopher;
 
 class RenderHTML5 extends Component implements Render {
 
-  public const Content-Type    = "text/html";
-  public const DefaultPriority = 10;
-
+   const ContentType    = "text/html";
+   const DefaultCharset  = "UTF-8";
+   const DefaultPriority = 10;
+  
+  //stub
   function render($data) {
     $output = file_get_contents(__DIR__."/template/index.tpl");
 

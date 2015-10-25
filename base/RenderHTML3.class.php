@@ -28,45 +28,48 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
 */
 
-
-
 namespace Philosopher;
 
-class Wizard extends Component {
-  private $_current_page = array();
-  private $_pages = array();
+
+// note:: perhaps html4 fallback is sufficient
+class RenderHTML3 extends Component implements Render {
+
+   const ContentType     = "text/html";
+   const DefaultCharset  = "ISO-8859-1";
+   const DefaultPriority = 99;
   
-  public function render() {
-    // STUB
-    $this->stone->_data['content_raw'] .= "rendering...";    
-    $this->stone->_data['content_raw'] .= $this->_current_page['content_raw'];
-  }
+   // TODO constructor
+   // if (!(function_exists("iconv")) raise error, please enable iconv
+   // overall, other module dependency checks
 
-  public function process() {
-    $result = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['process']);
-    if (isset($result['next_page'])) {
-      if (isset($this->_pages[$result['next_page']])) {
-        $this->_current_page = $this->_pages[$result['next_page']];
-      } else {
-        //page not found
-      }
-    }
-  }
-
-  public function setPage($page) {
-    if (isset($this->_pages[$page])) {
-      $this->_current_page = $this->_pages[$page];
-          $this->stone->_data['content_raw'] .= "Page $page set<br>"; 
-    } else {
-      //page not found
-          $this->stone->_data['content_raw'] .= "Page $page not found<br>"; 
-    }
-  }
-
-  public function registerPage($page) {
-        $this->stone->_data['content_raw'] .= "Page " . key($page) . "added<br>"; 
-    $this->_pages=array_merge($this->_pages,$page);
-  }
   
+
+  //stub
+  function render($data) {
+  //stub-stub-stub
+  //TODO: this loads the HTML5 template, need a different templace for legacy
+    $output = file_get_contents(__DIR__."/template/index.tpl");
+
+    $template_url = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__."/template/");
+    $output = str_replace("{template_path}",$template_url,$output);
+    $output = str_replace("{main_center}",$data['content_raw'],$output);
+    $output = str_replace("{html_title}",$data['title'], $output);   
+
+    $output = str_replace("{main_right}",$data['content_right_raw'],$output);
+
+ 
+    $menu = "";
+    foreach ($data['menu'] as $menuItem) {
+      $menu .= "<a href=/" .$menuItem['slug'] ."><button>". $menuItem['title'] . "</button></a><br>";
+    }
+    $output = str_replace("{main_left}",$menu,$output);
+
+    // For legacy browsers we serve iso-8859-1 in stead of utf-8
+    // Internally we're supposed to do utf-8
+    $output = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $output);
+    echo $output;
+  }
+
 }
+
 ?>

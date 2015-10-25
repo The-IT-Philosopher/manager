@@ -35,11 +35,43 @@ namespace Philosopher;
 
 class Stone {
   private $_components = array();
-
+  private $_data       = array();
+  private $_wizard;
   private $_renders    = array();
   private $_auths      = array();
 
   private $_errors     = array();
+
+  private $pdo;
+  private $databaseConnection;
+
+  function __sleep() {
+    $this->pdo = NULL; //PDO cannot be resialised
+    return array_keys(get_object_vars($this));
+  }
+  function __wakeup(){
+    $this->pdo = $this->databaseConnection->connect();
+  }
+
+  // Should the uid/cap remain here or be moves to a user class?
+  // As they are essential to the system, they might remain here, for now.
+  private $uid;
+  private $cap;
+
+  public function setUserID($uid) {
+    $this->uid = $uid;
+  }
+
+  public function setUserCapabilities($cap) {
+    $this->cap = $cap;
+  }
+
+  public function &__get($name) {
+    //Indirect modification of overloaded property Philosopher\\Stone::$_data has no effect
+    //Does & make it "direct"? YES!!!
+    // https://phpolyk.wordpress.com/2012/07/25/indirect-modification-of-overloaded-property/
+    return $this->$name;
+  }
 
   public function registerComponent($component) {
 
@@ -49,6 +81,15 @@ class Stone {
 
       if ($component instanceof Render) $this->_renders[] = $component;
       if ($component instanceof Auth) $this->_auths[] = $component;
+      if ($component instanceof Wizard) $this->_wizard = $component;
+
+      // The following line are for testing only
+      // Probably merge to init() functions
+      if ($component instanceof DatabaseConnection) {
+        $this->databaseConnection = $component;
+        $this->pdo = $component->connect();
+      }
+      if ($component instanceof AuthSession) $component->resume();
 
       return true;
     } catch (\Exception $e) {
@@ -58,14 +99,24 @@ class Stone {
   }
 
   public function processRequest(){
-    //$this->_components[0]->resume(); // test // TODO: database support
-    $data=array();
-    $data['title']="The IT Philosopher - Manager";
-    $data['content_right_raw'] .= "This is right!";
-    $data['content_raw'] .= "Hello world!";
-    $data['menu']=array();  
-    $this->_renders[0]->render($data);
+
+    foreach ($this->_components as $component ) {
+      if (method_exists($component, "init")) $component->init();
+    }
+
+    //testing
+    $this->_wizard->setPage("kvk_enter_form");
+    $this->_wizard->render();
+
+    $this->_data['title']="The IT Philosopher - Manager";
+    $this->_data['content_right_raw'] .= "<PRE>" . var_export($_SESSION,true) . "</PRE>";
+    $this->_data['content_raw'] .= "H€llo world!";
+    $this->_data['menu']=array();  
+    
+    $this->_renders[0]->render($this->_data);
   }
+
+
 
 }
 ?>
