@@ -33,30 +33,65 @@ POSSIBILITY OF SUCH DAMAGE.
 namespace Philosopher;
 
 class Wizard extends Component {
-  private $_current_page = array();
+  private $_current_page;
+  private $_init_page;
   private $_pages = array();
   
   public function render() {
     // STUB
+    if (!isset($this->_current_page)) $this->_current_page=$this->_init_page;
+
     $this->stone->_data['content_raw'] .= "rendering...";    
-    $this->stone->_data['content_raw'] .= $this->_current_page['content_raw'];
+    //$this->stone->_data['content_raw'] .= $this->_current_page['content_raw'];
+    //$form = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['render_raw']);
+      $form = call_user_func(array( $this->_current_page['object'], 
+                                    $this->_current_page['render_raw']));
+    $this->stone->_data['content_raw'] .= $form;
+
   }
 
   public function process() {
-    $result = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['process']);
+    if (!isset($this->_current_page)) $this->_current_page=$this->_init_page;
+
+    //$this->stone->_data['content_raw'] .= "calling " . __NAMESPACE__ .'\\' . $this->_current_page['process'] . "<BR>";
+
+    //$result = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['process']);
+    // TODO: rename $result as $result should be reserved for return values
+      $result = call_user_func(array( $this->_current_page['object'], 
+                                    $this->_current_page['process']));
+
     if (isset($result['next_page'])) {
+      $this->stone->_data['content_raw'] .= "Retrieved next page from processing"; 
       if (isset($this->_pages[$result['next_page']])) {
+      $this->stone->_data['content_raw'] .= "Retrieved next page set"; 
         $this->_current_page = $this->_pages[$result['next_page']];
       } else {
         //page not found
+      $this->stone->_data['content_raw'] .= "Retrieved next page not found"; 
       }
+    } else {
+      $this->stone->_data['content_raw'] .= "Retrieved no next page from processing"; 
+      $this->stone->_data['content_raw'] .= "<PRE>" . var_export($result,true) . "</PRE>";
+    }
+    if (isset($result['error'])) {
+      $this->stone->_data['content_raw'] .= $result['error'];
     }
   }
 
   public function setPage($page) {
     if (isset($this->_pages[$page])) {
       $this->_current_page = $this->_pages[$page];
-          $this->stone->_data['content_raw'] .= "Page $page set<br>"; 
+          $this->stone->_data['content_raw'] .= "Current Page $page set<br>"; 
+    } else {
+      //page not found
+          $this->stone->_data['content_raw'] .= "Page $page not found<br>"; 
+    }
+  }
+
+  public function initPage($page) {
+    if (isset($this->_pages[$page])) {
+      $this->_init_page = $this->_pages[$page];
+          $this->stone->_data['content_raw'] .= "Init Page $page set<br>"; 
     } else {
       //page not found
           $this->stone->_data['content_raw'] .= "Page $page not found<br>"; 

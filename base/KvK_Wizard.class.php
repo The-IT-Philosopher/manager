@@ -39,16 +39,91 @@ class KvK_Wizard extends Component {
   
   function init() {
     $this->stone->_data['content_raw'] .= "Attemting to add kvk wizard"; 
+
+
     $this->stone->_wizard->registerPage(
-      array("kvk_enter_form"=>array('content_raw'=> "HTMLFORM", "process" => "KvK_Wizard::process")));
+      array("kvk_enter"=>array('render_raw'=> "kvk_enter_render_raw", 
+                               "process" => "kvk_enter_process",
+                               "object" => $this)));
+
+    $this->stone->_wizard->registerPage(
+      array("kvk_ok"=>array('render_raw'=> "kvk_ok_render_raw", 
+                               "process" => "kvk_ok_process",
+                               "object"  => $this)));
+  }
+
+  function kvk_enter_render_raw(){
+    $result  = "<form method=post>";
+    $result .= "<table>";
+    $result .= "<tr><td>KvK Nummer</td><td><input type=number name=kvk></td></tr>";
+    $result .= "<tr><td></td><td><input type=submit value=volgense></td></tr>";
+    $result .= "</table></form>";
+    return $result;
+  }
+
+  function kvk_ok_render_raw(){
+    $result  = "<PRE>DATA FROM OPENOVERHEID.IO\n";
+    $result .= var_export($this->stone->_data['kvkData'],true);
+    $result .= "</PRE>";
+    return $result;
   }
 
   function setDonePage($donepage) {
     $this->_donePage=$donepage;
   }
 
-  function process() {
-    return array();
+  function kvk_enter_process() {
+    $result = array();
+    // for now, request class instance directly.
+    // later, we'll query for the data properties it provides and
+    // determine the class we need that way.
+    $DP = $this->stone->DP_OverheidIO; 
+    if ($DP==NULL) {
+      $this->stone->_data['content_raw'] .= "<pre>Could not get DataProvider!!!</pre>";
+      return;
+    }
+    if ($DP->check($_POST['kvk'])) {
+      //--    
+
+      $kvkData = $DP->getAddress();
+      $this->stone->_data['kvkData'] = $kvkData;
+      $this->stone->_data['content_raw'] .= "<pre>Retrieved KvK Data</pre>";
+      //$_SESSION['CustomerAddWizard']['page']+=2;
+      $result['next_page']="kvk_ok"; // TODO: This is a debugging value;
+
+      /* Disabling inserting data to database untill the rest of the wizard
+       * is in place
+      //TODO: Store KvK data to database;
+      $sth = $pdo->prepare("INSERT INTO address (address_street, address_number, address_postalcode, address_city, address_country) 
+                            VALUES (:address_street, :address_number, :address_postalcode, :address_city, 'NL')");
+      $insertData = array();
+      $insertData[':address_street']    = $kvkData['address_street'];
+      $insertData[':address_number']    = $kvkData['address_number'];
+      $insertData[':address_postalcode']= $kvkData['address_postalcode'];
+      $insertData[':address_city']= $this->stone->_data['kvkData']['address_city'];
+      $sth->execute($insertData);
+      $address_id = $pdo->lastInsertId(); 
+      $this->stone->_data['addressId'] = $address_id; 
+      $sth = $pdo->prepare("INSERT INTO organisation (organisation_name, organisation_type, organisation_nl_kvk, organisation_country)
+                            VALUES (:organisation_name, :organisation_type, :organisation_nl_kvk, 'NL')");
+
+      $insertData = array();
+      $insertData[':organisation_name'] = $kvkData['organisation_name'];
+      $insertData[':organisation_type'] = $this->stone->_data['organisationType'];
+      $insertData[':organisation_nl_kvk'] = $kvkData['kvk_nummer'];
+      $sth->execute($insertData);
+      $organisation_id = $pdo->lastInsertId();
+      $this->stone->_data['organisationId'] = $organisation_id;
+      $sth = $pdo->prepare ("INSERT INTO link_address2organisation (address_id, organisation_id, address_type) VALUES
+                             (:address_id, :organisation_id, 'validated' )");
+      $sth->execute(array(":address_id"=>$address_id, ":organisation_id" => $organisation_id));
+      */
+      //--
+    } else {
+      // for now
+      $result['error'] = "KvK did not validate, or validation error";
+    }
+    return $result;
   }
 
 

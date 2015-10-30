@@ -70,14 +70,18 @@ class Stone {
     //Indirect modification of overloaded property Philosopher\\Stone::$_data has no effect
     //Does & make it "direct"? YES!!!
     // https://phpolyk.wordpress.com/2012/07/25/indirect-modification-of-overloaded-property/
-    return $this->$name;
+
+    if (isset($this->_components["Philosopher\\$name"])) return $this->_components["Philosopher\\$name"]; 
+    if (isset($this->$name)) return $this->$name;
+    $this->_data['content_raw'] = "<PRE>STONE: Could not retrieve $name </pre>";
+    return NULL;
   }
 
   public function registerComponent($component) {
 
     try {
       $component->load($this);
-      $this->_components[] = $component; 
+      $this->_components[get_class($component)] = $component; 
 
       if ($component instanceof Render) $this->_renders[] = $component;
       if ($component instanceof Auth) $this->_auths[] = $component;
@@ -104,14 +108,16 @@ class Stone {
       if (method_exists($component, "init")) $component->init();
     }
 
+    $this->_data['title']="The IT Philosopher - Manager";
+    $this->_data['content_right_raw'] = "<PRE><![CDATA[" . var_export($_SESSION,true) . "]]></PRE>";
+    $this->_data['content_raw'] = "H€llo world!";
+    $this->_data['menu']=array();  
+
     //testing
-    $this->_wizard->setPage("kvk_enter_form");
+    $this->_wizard->initPage("kvk_enter");
+    $this->_wizard->process();    
     $this->_wizard->render();
 
-    $this->_data['title']="The IT Philosopher - Manager";
-    $this->_data['content_right_raw'] .= "<PRE>" . var_export($_SESSION,true) . "</PRE>";
-    $this->_data['content_raw'] .= "H€llo world!";
-    $this->_data['menu']=array();  
     
     $this->_renders[0]->render($this->_data);
   }
