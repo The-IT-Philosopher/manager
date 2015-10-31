@@ -44,8 +44,7 @@ class Wizard extends Component {
     $this->stone->_data['content_raw'] .= "rendering...";    
     //$this->stone->_data['content_raw'] .= $this->_current_page['content_raw'];
     //$form = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['render_raw']);
-      $form = call_user_func(array( $this->_current_page['object'], 
-                                    $this->_current_page['render_raw']));
+      $form = call_user_func($this->_current_page['render_raw']);
     $this->stone->_data['content_raw'] .= $form;
 
   }
@@ -57,8 +56,7 @@ class Wizard extends Component {
 
     //$result = call_user_func(__NAMESPACE__ .'\\' . $this->_current_page['process']);
     // TODO: rename $result as $result should be reserved for return values
-      $result = call_user_func(array( $this->_current_page['object'], 
-                                    $this->_current_page['process']));
+      $result = call_user_func($this->_current_page['process']);
 
     if (isset($result['next_page'])) {
       $this->stone->_data['content_raw'] .= "Retrieved next page from processing"; 

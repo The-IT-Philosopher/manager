@@ -50,7 +50,7 @@ class Stone {
     return array_keys(get_object_vars($this));
   }
   function __wakeup(){
-    $this->pdo = $this->databaseConnection->connect();
+      $this->pdo = $this->databaseConnection->connect();
   }
 
   // Should the uid/cap remain here or be moves to a user class?
@@ -110,16 +110,18 @@ class Stone {
 
     $this->_data['title']="The IT Philosopher - Manager";
     $this->_data['content_right_raw'] = "<PRE><![CDATA[" . var_export($_SESSION,true) . "]]></PRE>";
-    $this->_data['content_raw'] = "H€llo world!";
+//    $this->_data['content_raw'] = "H€llo world!";
     $this->_data['menu']=array();  
 
     //testing
-    $this->_wizard->initPage("kvk_enter");
+    $this->_wizard->initPage("Wizard_Company_ChooseCountry");
     $this->_wizard->process();    
     $this->_wizard->render();
 
     
     $this->_renders[0]->render($this->_data);
+    $this->_data['content_right_raw'] = ""; // prevent reflection of previous right_raw
+    $this->_data['content_raw'] = "";
   }
 
 

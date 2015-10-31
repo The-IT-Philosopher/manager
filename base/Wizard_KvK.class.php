@@ -32,24 +32,25 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-class KvK_Wizard extends Component {
+
+// TODO: rename so Wizard becomes a prefix
+// Also ... see how to create a good structure
+class Wizard_KvK extends Component {
 
   private $_donePage = "done";
-
   
+  function setDonePage($donepage) {
+    $this->_donePage=$donepage;
+  }
+
   function init() {
-    $this->stone->_data['content_raw'] .= "Attemting to add kvk wizard"; 
-
+    $this->stone->_wizard->registerPage(
+      array("kvk_enter"=>array('render_raw'=> array($this, "kvk_enter_render_raw"), 
+                               "process"   => array($this, "kvk_enter_process"))));
 
     $this->stone->_wizard->registerPage(
-      array("kvk_enter"=>array('render_raw'=> "kvk_enter_render_raw", 
-                               "process" => "kvk_enter_process",
-                               "object" => $this)));
-
-    $this->stone->_wizard->registerPage(
-      array("kvk_ok"=>array('render_raw'=> "kvk_ok_render_raw", 
-                               "process" => "kvk_ok_process",
-                               "object"  => $this)));
+      array("kvk_ok"=>array('render_raw'=> array($this, "kvk_ok_render_raw"), 
+                               "process" => array($this, "kvk_ok_process"))));
   }
 
   function kvk_enter_render_raw(){
@@ -68,11 +69,8 @@ class KvK_Wizard extends Component {
     return $result;
   }
 
-  function setDonePage($donepage) {
-    $this->_donePage=$donepage;
-  }
-
   function kvk_enter_process() {
+    if (!isset($_POST)) return;
     $result = array();
     // for now, request class instance directly.
     // later, we'll query for the data properties it provides and
