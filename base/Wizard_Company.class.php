@@ -67,10 +67,29 @@ class Wizard_Company extends Component {
   }
 
   function Wizard_Company_ChooseCountryEU_render_raw(){
-    return "Choose EU Country";
+  //STUB
+    $sth  = $this->stone->pdo->prepare("SELECT alpha2, langNL FROM country where alpha2 IN (SELECT alpha2 from country_vies) ORDER BY langNL"); 
+    $sth->execute();
+
+    $result = "<form method=post><select name=country>";
+    while ($country = $sth->fetch()) {
+      $result .= "<option value=" . $country['alpha2'] . ">".$country['langNL'] . "</option>";
+    }
+    $result .= "</select><input type=submit value=volgende></form>";
+    return $result;
   }
+
   function Wizard_Company_ChooseCountryWORLD_render_raw(){
-    return "Choose Non-EU Country";
+  //STUB
+    $sth  = $this->stone->pdo->prepare("SELECT alpha2, langNL FROM country where alpha2 NOT IN (SELECT alpha2 from country_vies) ORDER BY langNL"); 
+    $sth->execute();
+
+    $result = "<form method=post><select name=country>";
+    while ($country = $sth->fetch()) {
+      $result .= "<option value=" . $country['alpha2'] . ">".$country['langNL'] . "</option>";
+    }
+    $result .= "</select><input type=submit value=volgende></form>";
+    return $result;
   }
 
   function Wizard_Company_ChooseCountry_process(){
@@ -84,7 +103,6 @@ class Wizard_Company extends Component {
       } else {
         $result['error'] = "KvK Wizard not available"; 
       }
-      return $result;
     }
     if (isset($_POST['region']))  {
       if ($_POST['region'] == "EU") {
@@ -93,7 +111,7 @@ class Wizard_Company extends Component {
         $result['next_page'] = "Wizard_Company_ChooseCountryWORLD";
       }
     }
-
+    return $result;
   }
 
   function Wizard_Company_ChooseCountryEU_process(){
