@@ -70,8 +70,8 @@ class Wizard_KvK extends Component {
   }
 
   function kvk_enter_process() {
-    if (!isset($_POST)) return;
     $result = array();
+    if (!isset($_POST)) return $result;
     // for now, request class instance directly.
     // later, we'll query for the data properties it provides and
     // determine the class we need that way.

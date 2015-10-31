@@ -55,6 +55,11 @@ class Wizard_Company extends Component {
                                'render_raw'    => array( $this, "Wizard_Company_ChooseCountryWORLD_render_raw"), 
                                "process"       => array( $this, "Wizard_Company_ChooseCountryWORLD_process"))));
 
+    $this->stone->_wizard->registerPage(
+      array("Wizard_Company_ChooseOrganisationType"=>array(
+                               'render_raw'    => array( $this, "Wizard_Company_ChooseOrganisationType_render_raw"), 
+                               "process"       => array( $this, "Wizard_Company_ChooseOrganisationType_process"))));
+
   }
 
   function Wizard_Company_ChooseCountry_render_raw(){
@@ -92,12 +97,16 @@ class Wizard_Company extends Component {
     return $result;
   }
 
+  function Wizard_Company_ChooseOrganisationType_render_raw(){
+  }
+
   function Wizard_Company_ChooseCountry_process(){
     if (!isset($_POST)) return $array();
     $result = array();
     if (isset($_POST['country']) && $_POST['country']=='NL') {
-      $Wizard_KVK = $this->stone->Wizard_KvK;
-      if ($Wizard_KVK) {
+      $this->stone->_data['organisationCountry'] = "NL";
+      $Wizard_KvK = $this->stone->Wizard_KvK;
+      if ($Wizard_KvK) {
         //perhaps we need a better page identifier?
         $result['next_page'] = "kvk_enter"; 
       } else {
@@ -115,10 +124,32 @@ class Wizard_Company extends Component {
   }
 
   function Wizard_Company_ChooseCountryEU_process(){
-    return array();
+    $result = array();
+    if (isset($_POST['country'])) {
+      $this->stone->_data['organisationCountry'] = $_POST['country'];
+
+      $Wizard_VIES = $this->stone->Wizard_VIES;
+      if ($Wizard_VIES) {
+        //perhaps we need a better page identifier?
+        $result['next_page'] = "vies_enter"; 
+      } else {
+        $result['error'] = "VIES Wizard not available"; 
+      }
+
+
+    }
+    return $result;
   }
+
   function Wizard_Company_ChooseCountryWORLD_process(){
-    return array();
+    $result = array();
+    if (isset($_POST['country'])) {
+      $this->stone->_data['organisationCountry'] = $_POST['country'];
+    }
+    return $result;
+  }
+
+  function Wizard_Company_ChooseOrganisationType_process(){
   }
 
 }
