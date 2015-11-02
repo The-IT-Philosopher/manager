@@ -14,7 +14,7 @@
   <body>
     <div class="container header">
       <div class="left">
-        {top_left}
+        <div class="content">{top_left}</div>
       </div>
       <div class="center">
         <div class="container">
@@ -30,19 +30,19 @@
         </div>
       </div>
       <div class="right">
-        {top_right}
+        <div class="content">{top_right}</div>
       </div>
     </div>
 
     <div class="container main">
       <div class="left">
-        {main_left}
+        <div class="content">{main_left}</div>
       </div>
       <div class="center">
-        {main_center}
+        <div class="content">{main_center}</div>
       </div>
       <div class="right">
-        {main_right}
+        <div class="content">{main_right}</div>
       </div>
     </div>
 

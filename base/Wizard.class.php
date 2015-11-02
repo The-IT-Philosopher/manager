@@ -35,8 +35,11 @@ namespace Philosopher;
 class Wizard extends Component {
   private $_current_page;
   private $_init_page;
+
   private $_pages = array();
-  
+   
+
+
   public function render() {
     // STUB
     if (!isset($this->_current_page)) $this->_current_page=$this->_init_page;

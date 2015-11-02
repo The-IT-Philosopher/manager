@@ -42,6 +42,8 @@ class Stone {
 
   private $_errors     = array();
 
+  private $_request;
+
   private $pdo;
   private $databaseConnection;
 
@@ -103,6 +105,21 @@ class Stone {
   }
 
   public function processRequest(){
+    $this->_request = explode("/", $_SERVER['REQUEST_URI']);
+    array_shift($this->_request);
+    
+
+    // TODO register pages
+    if ($this->_request[0]=="logout") {
+      $this->AuthSession->terminate();
+      //reset session
+      session_destroy();
+      $_SESSION = array();
+
+      // how to reset the stone safely?
+      // TODO ACL
+      
+    }
 
     foreach ($this->_components as $component ) {
       if (method_exists($component, "init")) $component->init();
@@ -113,11 +130,13 @@ class Stone {
     $this->_data['menu']=array();  
 
     //testing
-    $this->_wizard->initPage("Wizard_Company_ChooseCountry");
+    //$this->_wizard->initPage("Wizard_Company_ChooseCountry");
+    $this->Test_Wizard->setDonePage("Wizard_Company_ChooseCountry");
+    $this->_wizard->initPage("is_6");
     $this->_wizard->process();    
     $this->_wizard->render();
 
-  $this->_data['content_right_raw'] = "<PRE><![CDATA[" . var_export($_SESSION,true) . "]]></PRE>";
+    $this->_data['content_right_raw'] = "<PRE><![CDATA[" . @var_export($_SESSION,true) . "]]></PRE>";
     
     $this->_renders[0]->render($this->_data);
     $this->_data['content_right_raw'] = ""; // prevent reflection of previous right_raw

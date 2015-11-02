@@ -2,12 +2,15 @@ html, body {
   font-family: Ubuntu, sans-serif;
   width: 100%;
   height: 100%;
+  max-height: 100%;
   margin: 0px;
   padding: 0px;
-  position: relative;
+  position: absolute;
   display: flex;
   flex-direction: column;
 }
+
+
 
 .container {
   display: flex;
@@ -22,8 +25,13 @@ html, body {
 }
 
 .header * .title {
-  vertical-align: middle; /* works on firefox, aligns top on chrome@android */ 
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  /*
+  vertical-align: middle;  works on firefox, aligns top on chrome  
   display: table-cell;
+  */
 }
 
 .header .right {
@@ -151,6 +159,8 @@ html {
   /* Detect mobile device using css only */
   /* experimental technology */
   /* Microsoft Edge on a non-touch device also triggers this */
+  /* Chromium on non-touch devide as well */
+  /* Look up Media Quaries 4, there was something more usefull there*/
   body { color : blue; }
   /* Use @import and allow other cases to import it as well
      That should be the default for any case above anyways
@@ -162,5 +172,10 @@ html {
 @supports not (display: flex) {}
 
 
+.content {
+  height: 0px; 
+  min-height: 100%;
+}
+
 /* DEBUGGING */
-.right { width:500px; }
+.right { width:450px;  }

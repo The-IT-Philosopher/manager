@@ -32,26 +32,36 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
+
+
 class Test_Wizard extends Component {
 
-  private $_donePage = "done";
+
+  private $_done_page;
+  function setDonePage($donepage) {
+    $this->_done_page=$donepage;
+  }
 
   
   function init() {
     $this->stone->_data['content_raw'] .= "Attemting to add Test Wizard"; 
-    $rawform = "<form method=post>Enter 6<input name=test><input type=submit></form>";
+    $rawform = 
     $this->stone->_wizard->registerPage(
-      array("is_6"=>array('content_raw'=> $rawform, "process" => "Test_Wizard::process6")));
+      array("is_6"=>array('render_raw'=> "\\Philosopher\\Test_Wizard::form6" , "process" => "\\Philosopher\\Test_Wizard::process6")));
 
-    $rawform = "<form method=post>Enter 7<input name=test><input type=submit></form>";
+    $rawform = 
     $this->stone->_wizard->registerPage(
-      array("is_7"=>array('content_raw'=> $rawform, "process" => "Test_Wizard::process7")));
-
+      array("is_7"=>array('render_raw'=> "\\Philosopher\\Test_Wizard::form7" , "process" => array($this,"process7") )));
   }
 
-  function setDonePage($donepage) {
-    $this->_donePage=$donepage;
+  function form6(){
+    return "<form method=post>Enter 6<input name=test><input type=submit></form>";
   }
+  function form7(){
+    return "<form method=post>Enter 7<input name=test><input type=submit></form>";
+  }
+
+
 
   function process6() {
     $result = array();
@@ -61,7 +71,10 @@ class Test_Wizard extends Component {
 
   function process7() {
     $result = array();
-    if (7==$_POST['test']) $result['next_page'] = $this->_donepage; else $result['error'] = 'please enter 7';
+    if (7==$_POST['test']) $result['next_page'] = $this->_done_page; else $result['error'] = 'please enter 7';
     return $result;
   }
 }
+
+
+
