@@ -1,4 +1,4 @@
-*  Port all wizards
+*  Port and integrate all wizards
 
 *  Generate forms by code (port code from BlaatBase?) (HTML renderer)
 
@@ -7,6 +7,8 @@
 *  Sub projects
 
 *  Invoice generation
+
+*  Payment provider integration
 
 *  Recover __wakeup when client has outdates information in his session
 

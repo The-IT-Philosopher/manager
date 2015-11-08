@@ -132,8 +132,8 @@ class Stone {
 
     //testing
     //$this->_wizard->initPage("Wizard_Company_ChooseCountry");
-    $this->Test_Wizard->setDonePage("Wizard_Company_ChooseCountry");
-    $this->_wizard->initPage("is_6");
+    $this->Wizard_Person->setDonePage("Wizard_Company_ChooseCountry");
+    $this->_wizard->initPage("person_enter");
     $this->_wizard->process();    
     $this->_wizard->render();
 
