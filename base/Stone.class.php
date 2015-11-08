@@ -35,7 +35,7 @@ namespace Philosopher;
 
 class Stone {
   private $_components = array();
-  private $_data       = array();
+  private $_data       = array("content_raw"=>"");
   private $_wizard;
   private $_renders    = array();
   private $_auths      = array();
@@ -76,7 +76,8 @@ class Stone {
     if (isset($this->_components["Philosopher\\$name"])) return $this->_components["Philosopher\\$name"]; 
     if (isset($this->$name)) return $this->$name;
     $this->_data['content_raw'] = "<PRE>STONE: Could not retrieve $name </pre>";
-    return NULL;
+    $snull=NULL;
+    return $null;
   }
 
   public function registerComponent($component) {

@@ -65,13 +65,17 @@ class Test_Wizard extends Component {
 
   function process6() {
     $result = array();
-    if (6==$_POST['test']) $result['next_page'] = 'is_7'; else $result['error'] = 'please enter 6';
+    if (isset($_POST['test'])) { 
+      if (6==$_POST['test']) $result['next_page'] = 'is_7'; else $result['error'] = 'please enter 6';
+    }
     return $result;
   }
 
   function process7() {
     $result = array();
-    if (7==$_POST['test']) $result['next_page'] = $this->_done_page; else $result['error'] = 'please enter 7';
+    if (isset($_POST['test'])) { 
+      if (7==$_POST['test']) $result['next_page'] = $this->_done_page; else $result['error'] = 'please enter 7';
+    }
     return $result;
   }
 }

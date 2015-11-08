@@ -46,12 +46,12 @@ namespace Philosopher;
 
     function classLoader($classname) {
       $classname = str_replace("Philosopher\\","",$classname);
-      include ( __DIR__ . "/$classname.class.php") ;
+      @include ( __DIR__ . "/$classname.class.php") ;
     }
 
     function interfaceLoader($classname) {
       $classname = str_replace("Philosopher\\","",$classname);
-      include ( __DIR__ . "/$classname.interface.php") ;
+      @include ( __DIR__ . "/$classname.interface.php") ;
     }
 
 
