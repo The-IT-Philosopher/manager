@@ -1,0 +1,13 @@
+*  Port all wizards
+
+*  Generate forms by code (port code from BlaatBase?) (HTML renderer)
+
+*  Login/logout
+
+*  Sub projects
+
+*  Invoice generation
+
+*  Recover __wakeup when client has outdates information in his session
+
+*  Installation wizard
