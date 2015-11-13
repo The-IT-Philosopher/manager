@@ -39,7 +39,8 @@ html, body {
 }
 
 .container .center, .main .left, .main .right {
-  border: 1px solid blue;
+  /* border: 1px solid blue; */
+  border: 1px solid red; 
   border-radius: 12px;
   /* Firefox still doesn't support dotted border */
 }
@@ -56,12 +57,14 @@ html, body {
 /* Colour settings */
 
 html {
-  background-color: #ddf; 
+  /* background-color: #ddf;  */
+  background-color: #fdd;
 }
 
 .container .center, .main .left, .main .right {
-  background-color: #eef;
-  overflow:auto; /* See for what divs to enable this */
+  /* background-color: #eef; */
+  background-color: #fee; 
+  overflow:auto; 
 }
 
 
