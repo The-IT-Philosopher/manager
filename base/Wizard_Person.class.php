@@ -42,7 +42,7 @@ class Wizard_Person extends Component {
   }
 
   function init() {
-    $this->stone->_wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("person_enter"=>array('render_raw'=> array($this, "person_enter_render_raw"), 
                                "process"   => array($this, "person_enter_process"))));
   }

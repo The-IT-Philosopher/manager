@@ -44,11 +44,11 @@ class Wizard_KvK extends Component {
   }
 
   function init() {
-    $this->stone->_wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("kvk_enter"=>array('render_raw'=> array($this, "kvk_enter_render_raw"), 
                                "process"   => array($this, "kvk_enter_process"))));
 
-    $this->stone->_wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("kvk_ok"=>array('render_raw'=> array($this, "kvk_ok_render_raw"), 
                                "process" => array($this, "kvk_ok_process"))));
   }

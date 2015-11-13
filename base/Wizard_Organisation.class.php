@@ -30,6 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
+// TODO possibly rename the Wizard_ classes to just their name as we're starting to
+//      register pages etc as well
 class Wizard_Organisation extends Component {
 
   private $_donePage = "done";
@@ -40,25 +42,47 @@ class Wizard_Organisation extends Component {
   
   function init() {
 
-    $this->stone->_wizard->registerPage(
+    $this->stone->Page->registerPage(
+      array("organisations" => array (
+        process => array( $this, "Wizard_Organisation_ProcessPage")
+      )));
+
+    $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseCountry"=>array(
                                'render_raw'    => array( $this, "Wizard_Organisation_ChooseCountry_render_raw"), 
                                "process"       => array( $this, "Wizard_Organisation_ChooseCountry_process"))));
 
-    $this->stone->_wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseCountryEU"=>array(
                                'render_raw' => array( $this, "Wizard_Organisation_ChooseCountryEU_render_raw"), 
                                "process"    => array( $this, "Wizard_Organisation_ChooseCountryEU_process"))));
 
-    $this->stone->_wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseCountryNOTEU"=>array(
                                'render_raw'    => array( $this, "Wizard_Organisation_ChooseCountryNOTEU_render_raw"), 
                                "process"       => array( $this, "Wizard_Organisation_ChooseCountryNOTEU_process"))));
 
-    $this->stone->_wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseOrganisationType"=>array(
                                'render_raw'    => array( $this, "Wizard_Organisation_ChooseOrganisationType_render_raw"), 
                                "process"       => array( $this, "Wizard_Organisation_ChooseOrganisationType_process"))));
+
+  }
+
+  function Wizard_Organisation_ProcessPage() {
+    // we need propper rendering later .... 
+    $this->stone->_data['content_raw'] .= "<A href='add'><button>Toevoegen</button></a><a href='show'><button>Tonen</button></a><br>";
+
+    if ($this->stone->_request[1]=="add") {
+      $this->stone->Wizard->initPage("Wizard_Organisation_ChooseCountry");
+      $this->stone->Wizard_Organisation->setDonePage("person_enter");
+      $this->stone->Wizard->process();    
+      $this->stone->Wizard->render();
+    }
+
+    if ($this->stone->_request[1]=="show") {
+    $this->stone->_data['content_raw'] .= "todo<br>";
+    }
 
   }
 

@@ -36,7 +36,11 @@ namespace Philosopher;
 class Stone {
   private $_components = array();
   private $_data       = array("content_raw"=>"");
+
+  // might not be needed anymore with current magic
   private $_wizard;
+//  private $_page;
+
   private $_renders    = array();
   private $_auths      = array();
 
@@ -89,6 +93,7 @@ class Stone {
       if ($component instanceof Render) $this->_renders[] = $component;
       if ($component instanceof Auth) $this->_auths[] = $component;
       if ($component instanceof Wizard) $this->_wizard = $component;
+      if ($component instanceof Page) $this->_page = $component;
 
       // The following line are for testing only
       // Probably merge to init() functions
@@ -141,16 +146,16 @@ class Stone {
   } else $this->_data['content_raw'] .= "ERROR INSUFFICIENT CAPABILITIES<BR>";
 
 // STUB
-    if ($this->_request[0]=="organisations") {
+//    if ($this->_request[0]=="organisations") {
       // organisation add wizard
-      $this->_wizard->initPage("Wizard_Organisation_ChooseCountry");
-      $this->Wizard_Organisation->setDonePage("person_enter");
-      $this->_wizard->process();    
-      $this->_wizard->render();
+      //$this->_wizard->initPage("Wizard_Organisation_ChooseCountry");
+      //$this->Wizard_Organisation->setDonePage("person_enter");
+      //$this->_wizard->process();    
+      //$this->_wizard->render();
       
-    }
+//    }
 // STUB
-
+    $this->Page->render();
 
     $this->_data['content_right_raw'] = "<PRE><![CDATA[" . @var_export($_SESSION,true) . "]]></PRE>";
     

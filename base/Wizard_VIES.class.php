@@ -42,11 +42,11 @@ class Wizard_VIES extends Component {
   }
 
   function init() {
-    $this->stone->_wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("vies_enter"=>array('render_raw'=> array($this, "vies_enter_render_raw"), 
                                "process"   => array($this, "vies_enter_process"))));
 
-    $this->stone->_wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("vies_ok"=>array('render_raw'=> array($this, "vies_ok_render_raw"), 
                                "process" => array($this, "vies_ok_process"))));
   }

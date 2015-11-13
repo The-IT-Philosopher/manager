@@ -28,36 +28,27 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
 */
 
+
+
 namespace Philosopher;
 
-class RenderHTML5 extends Component implements Render {
-
-   const ContentType    = "text/html";
-   const DefaultCharset  = "UTF-8";
-   const DefaultPriority = 10;
-  
-  //stub
-  function render($data) {
-    $output = file_get_contents(__DIR__."/template/index.tpl");
-
-    $template_url = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__."/template/");
-    $output = str_replace("{template_path}",$template_url,$output);
-    $output = str_replace("{main_center}",$data['content_raw'],$output);
-    $output = str_replace("{html_title}",$data['title'], $output);   
-
-    $output = str_replace("{main_right}",$data['content_right_raw'],$output);
-
- 
-    $menu = "";
-    foreach ($data['menu'] as $menuItem) {
-      $menu .= "<a href=/" .$menuItem['slug'] ."/><button>". $menuItem['title'] . "</button></a><br>";
+class Page extends Component {
+   
+  private $_pages = array();
+//------------------------------------------------------------------------------
+  public function render() {
+  //TODO STUB
+    if (isset($this->_pages[$this->stone->_request[0]])){
+      //TODO RENDERING ENGINE
+      $content = call_user_func($this->_pages[$this->stone->_request[0]]['process']);
+    } else {
+      //404
     }
-    $output = str_replace("{main_left}",$menu,$output);
-
-
-    echo $output;
   }
+//------------------------------------------------------------------------------
+  public function registerPage($page) {
+    $this->_pages=array_merge($this->_pages,$page);
+  }
+//------------------------------------------------------------------------------
 
 }
-
-?>

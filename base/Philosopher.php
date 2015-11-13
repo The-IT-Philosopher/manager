@@ -58,6 +58,7 @@ try {
     $stone->registerComponent(new DatabaseConnection());
     $stone->registerComponent(new AuthSession());
     $stone->registerComponent(new Wizard());
+    $stone->registerComponent(new Page());
 
     $stone->registerComponent(new Wizard_KvK());
     $stone->registerComponent(new Wizard_VIES());
