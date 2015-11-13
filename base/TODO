@@ -1,9 +1,11 @@
 *  Port and integrate all wizards
 
-   -- Organisation database: 
-      split off address from database structure to a link table
+    -- We can add an organisation (KvK link only, TODO: Address wizard)
+    -- TODO: add person to organisation
+    -- TODO: Customer/Supplier links
 
 *  Address wizard 
+   -- Postcode API intergation
 
 *  Generate forms by code (port code from BlaatBase?) (HTML renderer)
 

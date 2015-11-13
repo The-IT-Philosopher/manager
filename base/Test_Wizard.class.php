@@ -44,7 +44,6 @@ class Test_Wizard extends Component {
 
   
   function init() {
-    $this->stone->_data['content_raw'] .= "Attemting to add Test Wizard"; 
     $rawform = 
     $this->stone->_wizard->registerPage(
       array("is_6"=>array('render_raw'=> "\\Philosopher\\Test_Wizard::form6" , "process" => "\\Philosopher\\Test_Wizard::process6")));

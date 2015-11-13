@@ -130,12 +130,27 @@ class Stone {
 //    $this->_data['content_raw'] = "H€llo world!";
     $this->_data['menu']=array();  
 
-    //testing
-    $this->_wizard->initPage("Wizard_Organisation_ChooseCountry");
-    $this->Wizard_Organisation->setDonePage("person_enter");
-    //$this->_wizard->initPage("person_enter");
-    $this->_wizard->process();    
-    $this->_wizard->render();
+
+  if (in_array("admin", $this->cap)) {
+    $menuItem = array();
+  
+    $menuItem = array();
+    $menuItem['title'] = "Organisaties";
+    $menuItem['slug']  = "organisations";
+    $this->_data['menu'][]=$menuItem;
+  } else $this->_data['content_raw'] .= "ERROR INSUFFICIENT CAPABILITIES<BR>";
+
+// STUB
+    if ($this->_request[0]=="organisations") {
+      // organisation add wizard
+      $this->_wizard->initPage("Wizard_Organisation_ChooseCountry");
+      $this->Wizard_Organisation->setDonePage("person_enter");
+      $this->_wizard->process();    
+      $this->_wizard->render();
+      
+    }
+// STUB
+
 
     $this->_data['content_right_raw'] = "<PRE><![CDATA[" . @var_export($_SESSION,true) . "]]></PRE>";
     

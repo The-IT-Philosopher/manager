@@ -86,13 +86,13 @@ class Wizard_KvK extends Component {
       $kvkData = $DP->getAddress();
       $this->stone->_data['kvkData'] = $kvkData;
       
-      $result['next_page']="kvk_ok"; // TODO: This is a debugging value;
+      $result['next_page']= $this->_donePage;
 
 
-      // TODO split off address stuff      
       
-      /*
-      $sth = $pdo->prepare("INSERT INTO address (address_street, address_number, address_postalcode, address_city, address_country) 
+      
+
+      $sth = $this->stone->pdo->prepare("INSERT INTO address (address_street, address_number, address_postalcode, address_city, address_country) 
                             VALUES (:address_street, :address_number, :address_postalcode, :address_city, 'NL')");
       $insertData = array();
       $insertData[':address_street']    = $kvkData['address_street'];
@@ -100,9 +100,9 @@ class Wizard_KvK extends Component {
       $insertData[':address_postalcode']= $kvkData['address_postalcode'];
       $insertData[':address_city']= $this->stone->_data['kvkData']['address_city'];
       $sth->execute($insertData);
-      $address_id = $pdo->lastInsertId(); 
+      $address_id = $this->stone->pdo->lastInsertId(); 
       $this->stone->_data['addressId'] = $address_id; 
-      $sth = $pdo->prepare("INSERT INTO organisation (organisation_name, organisation_type, organisation_nl_kvk, organisation_country)
+      $sth = $this->stone->pdo->prepare("INSERT INTO organisation (organisation_name, organisation_type, organisation_nl_kvk, organisation_country)
                             VALUES (:organisation_name, :organisation_type, :organisation_nl_kvk, 'NL')");
 
 
@@ -111,13 +111,13 @@ class Wizard_KvK extends Component {
       $insertData[':organisation_type'] = $this->stone->_data['organisationType'];
       $insertData[':organisation_nl_kvk'] = $kvkData['kvk_nummer'];
       $sth->execute($insertData);
-      $organisation_id = $pdo->lastInsertId();
+      $organisation_id = $this->stone->pdo->lastInsertId();
       $this->stone->_data['organisationId'] = $organisation_id;
-      $sth = $pdo->prepare ("INSERT INTO link_address2organisation (address_id, organisation_id, address_type) VALUES
+      $sth = $this->stone->pdo->prepare ("INSERT INTO link_address2organisation (address_id, organisation_id, address_type) VALUES
                              (:address_id, :organisation_id, 'validated' )");
       $sth->execute(array(":address_id"=>$address_id, ":organisation_id" => $organisation_id));
-      */
-      //--
+
+
     } else {
       // for now
       $result['error'] = "KvK did not validate, or validation error";
