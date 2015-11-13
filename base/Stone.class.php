@@ -131,9 +131,9 @@ class Stone {
     $this->_data['menu']=array();  
 
     //testing
-    //$this->_wizard->initPage("Wizard_Company_ChooseCountry");
-    $this->Wizard_Person->setDonePage("Wizard_Company_ChooseCountry");
-    $this->_wizard->initPage("person_enter");
+    $this->_wizard->initPage("Wizard_Organisation_ChooseCountry");
+    $this->Wizard_Organisation->setDonePage("person_enter");
+    //$this->_wizard->initPage("person_enter");
     $this->_wizard->process();    
     $this->_wizard->render();
 

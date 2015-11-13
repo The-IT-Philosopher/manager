@@ -30,23 +30,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-/*
-    // Your custom class dir
-    define('CLASS_DIR', __DIR__ .'/');
-
-    // Add your class dir to include path
-    set_include_path(get_include_path().PATH_SEPARATOR.CLASS_DIR);
-
-    // You can use this trick to make autoloader look for commonly used "My.class.php" type filenames
-    spl_autoload_extensions('.class.php');
-
-    // Use default autoload implementation
-*/
-    spl_autoload_register();
-
+//------------------------------------------------------------------------------
     function classLoader($classname) {
       $classname = str_replace("Philosopher\\","",$classname);
-      @include ( __DIR__ . "/$classname.class.php") ;
+      include ( __DIR__ . "/$classname.class.php") ;
     }
 
     function interfaceLoader($classname) {
@@ -54,9 +41,45 @@ namespace Philosopher;
       @include ( __DIR__ . "/$classname.interface.php") ;
     }
 
-
+    spl_autoload_register();
     spl_autoload_register('Philosopher\classLoader');
     spl_autoload_register('Philosopher\interfaceLoader');
+//------------------------------------------------------------------------------
+try {
+  ob_start();
+  session_start();
+  if (isset($_GET['reset'])) unset ($_SESSION['stone']); // test
+  if ( isset($_SESSION['stone'])) {
+    $stone = $_SESSION['stone'];
+  } else {
+    $stone = new Stone();
+    $_SESSION['stone']=$stone;
+    $stone->registerComponent(new RenderHTML5());
+    $stone->registerComponent(new DatabaseConnection());
+    $stone->registerComponent(new AuthSession());
+    $stone->registerComponent(new Wizard());
+
+    $stone->registerComponent(new Wizard_KvK());
+    $stone->registerComponent(new Wizard_VIES());
+    $stone->registerComponent(new Wizard_Organisation());
+    $stone->registerComponent(new Wizard_Person());
+    $stone->registerComponent(new Test_Wizard());
+    $stone->registerComponent(new DP_OverheidIO());
+  //
+    //$stone->registerComponent(new RenderXML());
+    //$stone->registerComponent(new RenderJSON());
+    //$stone->registerComponent(new RenderHTML3());
+  }
+
+  $stone->processRequest();
+} catch (Exception $e) {
+  stoned($e);  
+}
+//------------------------------------------------------------------------------
+
+
+
+
 
 
 ?>

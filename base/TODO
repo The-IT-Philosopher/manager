@@ -1,5 +1,10 @@
 *  Port and integrate all wizards
 
+   -- Organisation database: 
+      split off address from database structure to a link table
+
+*  Address wizard 
+
 *  Generate forms by code (port code from BlaatBase?) (HTML renderer)
 
 *  Login/logout
@@ -13,3 +18,11 @@
 *  Recover __wakeup when client has outdates information in his session
 
 *  Installation wizard
+
+*  Incoming invoices
+
+*  Link to ISPConfig
+
+*  Link to TransIP
+
+

@@ -85,13 +85,13 @@ class Wizard_KvK extends Component {
 
       $kvkData = $DP->getAddress();
       $this->stone->_data['kvkData'] = $kvkData;
-      $this->stone->_data['content_raw'] .= "<pre>Retrieved KvK Data</pre>";
-      //$_SESSION['CustomerAddWizard']['page']+=2;
+      
       $result['next_page']="kvk_ok"; // TODO: This is a debugging value;
 
-      /* Disabling inserting data to database untill the rest of the wizard
-       * is in place
-      //TODO: Store KvK data to database;
+
+      // TODO split off address stuff      
+      
+      /*
       $sth = $pdo->prepare("INSERT INTO address (address_street, address_number, address_postalcode, address_city, address_country) 
                             VALUES (:address_street, :address_number, :address_postalcode, :address_city, 'NL')");
       $insertData = array();
@@ -104,6 +104,7 @@ class Wizard_KvK extends Component {
       $this->stone->_data['addressId'] = $address_id; 
       $sth = $pdo->prepare("INSERT INTO organisation (organisation_name, organisation_type, organisation_nl_kvk, organisation_country)
                             VALUES (:organisation_name, :organisation_type, :organisation_nl_kvk, 'NL')");
+
 
       $insertData = array();
       $insertData[':organisation_name'] = $kvkData['organisation_name'];
