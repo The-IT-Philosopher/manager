@@ -137,12 +137,23 @@ class Stone {
 
 
   if (in_array("admin", $this->cap)) {
-    $menuItem = array();
   
     $menuItem = array();
     $menuItem['title'] = "Organisaties";
     $menuItem['slug']  = "organisations";
     $this->_data['menu'][]=$menuItem;
+
+    $menuItem = array();
+    $menuItem['title'] = "Klanten";
+    $menuItem['slug']  = "customers";
+    $this->_data['menu'][]=$menuItem;
+
+    $menuItem = array();
+    $menuItem['title'] = "Leveranciers";
+    $menuItem['slug']  = "suppliers";
+    $this->_data['menu'][]=$menuItem;
+
+
   } else $this->_data['content_raw'] .= "ERROR INSUFFICIENT CAPABILITIES<BR>";
 
 // STUB

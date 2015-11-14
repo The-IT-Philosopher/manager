@@ -28,28 +28,9 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
 */
 
-
-
 namespace Philosopher;
 
-class Page extends Component {
-   
-  private $_pages = array();
-//------------------------------------------------------------------------------
-  public function render() {
-  //TODO STUB
-    if (isset($this->_pages[$this->stone->_request[0]])){
-      //TODO RENDERING ENGINE
-      // perhaps this needs a different name then "process" 
-      $content = call_user_func($this->_pages[$this->stone->_request[0]]['process']);
-    } else {
-      //404
-    }
-  }
-//------------------------------------------------------------------------------
-  public function registerPage($page) {
-    $this->_pages=array_merge($this->_pages,$page);
-  }
-//------------------------------------------------------------------------------
+
+class Supplier extends Component {
 
 }

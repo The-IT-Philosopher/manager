@@ -182,3 +182,7 @@ html {
 
 /* DEBUGGING */
 .right { width:450px;  }
+
+.menu button {
+  width : 100%;
+}

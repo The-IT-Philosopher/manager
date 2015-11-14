@@ -48,10 +48,11 @@ class RenderHTML5 extends Component implements Render {
     $output = str_replace("{main_right}",$data['content_right_raw'],$output);
 
  
-    $menu = "";
+    $menu = "<div class='menu'>";
     foreach ($data['menu'] as $menuItem) {
       $menu .= "<a href=/" .$menuItem['slug'] ."/><button>". $menuItem['title'] . "</button></a><br>";
     }
+    $menu .= "</div>";
     $output = str_replace("{main_left}",$menu,$output);
 
 
