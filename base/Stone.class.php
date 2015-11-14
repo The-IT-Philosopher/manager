@@ -159,6 +159,10 @@ class Stone {
     $menuItem['slug']  = "suppliers";
     $this->_data['menu'][]=$menuItem;
 
+    $menuItem = array();
+    $menuItem['title'] = "Projecten";
+    $menuItem['slug']  = "projects";
+    $this->_data['menu'][]=$menuItem;
 
   } else $this->_data['content_raw'] .= "ERROR INSUFFICIENT CAPABILITIES<BR>";
 
@@ -174,7 +178,7 @@ class Stone {
 // STUB
     $this->Page->render();
 
-    $this->_data['content_right_raw'] = "<PRE><![CDATA[" . @var_export($_SESSION,true) . "]]></PRE>";
+    $this->_data['content_right_raw'] = "<PRE>" . htmlentities(@var_export($_SESSION,true)) . "></PRE>";
     
     $this->_renders[0]->render($this->_data);
     $this->_data['content_right_raw'] = ""; // prevent reflection of previous right_raw

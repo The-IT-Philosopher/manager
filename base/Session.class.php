@@ -63,7 +63,7 @@ class Session extends Component {
 
   function terminate(){
     //logout support
-    setcookie(ItPhilManagerSession, "" , 1); //unsetting cookie
+    setcookie("ItPhilManagerSession", "" , 1); //unsetting cookie
   }
 
   function start($user_id) {

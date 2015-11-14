@@ -68,6 +68,7 @@ try {
     $stone->registerComponent(new Person());
     $stone->registerComponent(new Customer());
     $stone->registerComponent(new Supplier());
+    $stone->registerComponent(new Project());
     $stone->registerComponent(new Test_Wizard());
     $stone->registerComponent(new DP_OverheidIO());
   //

@@ -58,6 +58,10 @@ class Wizard extends Component {
     //$this->stone->_data['content_raw'] .= "<pre>Result = \n" . var_export($result,1) . "</pre>";
 
     if (isset($result['next_page'])) {
+      if ($result['next_page']=="done") {
+        $this->stone->_data['content_raw'] .= "done";
+        $this->_current_page = NULL;
+      } else
       if (isset($this->_pages[$result['next_page']])) {
         $this->_current_page = $this->_pages[$result['next_page']];
       } else {
