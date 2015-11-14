@@ -2,14 +2,13 @@
 
     -- We can add an organisation (KvK link only, TODO: Address wizard)
     -- TODO: add person to organisation
-    -- TODO: Customer/Supplier links
 
 *  Address wizard 
    -- Postcode API intergation
 
 *  Generate forms by code (port code from BlaatBase?) (HTML renderer)
 
-*  Login/logout
+*  Better login/logout (re-check permissions after login so no refresh needed)
 
 *  Sub projects
 
