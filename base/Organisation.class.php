@@ -137,8 +137,8 @@ class Organisation extends Component {
     if (!(isset($_POST['country'])||isset($_POST['region']))) return array();
     $result = array();
     if (isset($_POST['country']) && $_POST['country']=='NL') {
-      $this->stone->_data['organisationCountry'] = "NL";
-      $this->stone->_data['organisationCountryVIES'] = 1;
+      $this->stone->Wizard->_data['organisationCountry'] = "NL";
+      $this->stone->Wizard->_data['organisationCountryVIES'] = 1;
         $result['next_page'] = "Wizard_Organisation_ChooseOrganisationType";
     }
     if (isset($_POST['region']))  {
@@ -154,8 +154,8 @@ class Organisation extends Component {
   function Wizard_Organisation_ChooseCountryEU_process(){
     $result = array("next_page"=>"Wizard_Organisation_ChooseOrganisationType");
     if (isset($_POST['country'])) {
-      $this->stone->_data['organisationCountry'] = $_POST['country'];
-      $this->stone->_data['organisationCountryVIES'] = 1;
+      $this->stone->Wizard->_data['organisationCountry'] = $_POST['country'];
+      $this->stone->Wizard->_data['organisationCountryVIES'] = 1;
     }
     return $result;
   }
@@ -163,8 +163,8 @@ class Organisation extends Component {
   function Wizard_Organisation_ChooseCountryNOTEU_process(){
     $result = array("next_page"=>"Wizard_Organisation_ChooseOrganisationType");
     if (isset($_POST['country'])) {
-      $this->stone->_data['organisationCountry'] = $_POST['country'];
-      $this->stone->_data['organisationCountryVIES'] = 0;
+      $this->stone->Wizard->_data['organisationCountry'] = $_POST['country'];
+      $this->stone->Wizard->_data['organisationCountryVIES'] = 0;
     }
     return $result;
   }
@@ -173,9 +173,9 @@ class Organisation extends Component {
     $result = array();    
     $result['next_page'] = $this->_donePage;
     if (isset($_POST['organisationType'])) {
-      $this->stone->_data['organisationType'] = $_POST['organisationType'];
-      if ($this->stone->_data['organisationCountry']=="NL") {
-        if (! in_array( $this->stone->_data['organisationType'], array('in_formation','association_unregged') )) {
+      $this->stone->Wizard->_data['organisationType'] = $_POST['organisationType'];
+      if ($this->stone->Wizard->_data['organisationCountry']=="NL") {
+        if (! in_array( $this->stone->Wizard->_data['organisationType'], array('in_formation','association_unregged') )) {
           // Dutch organisation registered by the KvK (Dutch Chamber of Commerce)
           $Wizard_KvK = $this->stone->KvK;
           if ($Wizard_KvK) {
@@ -185,8 +185,8 @@ class Organisation extends Component {
             //$result['error'] = "KvK Wizard not available"; 
           }
         }        
-      } else if ($this->stone->_data['organisationCountryVIES']) {
-        if (! in_array( $this->stone->_data['organisationType'], array('in_formation','association_unregged', 'association_regged') )) {
+      } else if ($this->stone->Wizard->_data['organisationCountryVIES']) {
+        if (! in_array( $this->stone->Wizard->_data['organisationType'], array('in_formation','association_unregged', 'association_regged') )) {
           // EU Organisation might have a tax number (Companies always have one, but foundations might not)
           $Wizard_VIES = $this->stone->VIES;
           if ($Wizard_VIES) {

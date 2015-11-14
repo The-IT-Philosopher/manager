@@ -61,8 +61,8 @@ class VIES extends Component {
   }
 
   function vies_ok_render_raw(){
-    $result  = "<PRE>DATA FROM OPENOVERHEID.IO\n";
-    $result .= var_export($this->stone->_data['viesData'],true);
+    $result  = "<PRE>DATA FROM VIES\n";
+    $result .= var_export($this->stone->Wizard->_data['viesData'],true);
     $result .= "</PRE>";
     return $result;
   }
@@ -72,9 +72,9 @@ class VIES extends Component {
     if (!isset($_POST)) return $result;
     $vat_number = strtoupper($_POST['vat']); // capitalise string
     $vat_number = str_replace(' ', '', $vat_number); // remove spaces
-    if (substr($vat_number,0,2)!=$this->stone->_data['organisationCountry']) {
+    if (substr($vat_number,0,2)!=$this->stone->Wizard->_data['organisationCountry']) {
       //VAT Number entered without country prefix
-      $vat_number = $this->stone->_data['organisationCountry'] . $vat_number;
+      $vat_number = $this->stone->Wizard->_data['organisationCountry'] . $vat_number;
     }
 
     $this->stone->_data['content_raw'] .= "<br>vat nr = $vat_number <br>";
@@ -92,7 +92,7 @@ class VIES extends Component {
       //       Belgian VAT number responses contain a prefixed company name
       //        Therefore.... only valid/invalid information is reliable
       //                      other information is inconsequent between states
-      $this->stone->_data['viesData'] = $vatData;
+      $this->stone->Wizard->_data['viesData'] = $vatData;
       //$data['content_raw'] .= "<pre>VIES DATA\n" . var_export($vatData,true) . "</pre>";
       /*      
       $sth = $pdo->prepare("UPDATE organisation 

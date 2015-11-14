@@ -137,11 +137,17 @@ class Stone {
 
 
   if (in_array("admin", $this->cap)) {
-  
+    //STUB
     $menuItem = array();
     $menuItem['title'] = "Organisaties";
     $menuItem['slug']  = "organisations";
     $this->_data['menu'][]=$menuItem;
+
+    $menuItem = array();
+    $menuItem['title'] = "Personen";
+    $menuItem['slug']  = "persons";
+    $this->_data['menu'][]=$menuItem;
+
 
     $menuItem = array();
     $menuItem['title'] = "Klanten";

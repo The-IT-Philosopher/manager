@@ -159,9 +159,9 @@ class Customer extends Component {
 //------------------------------------------------------------------------------
   function add_existing_render_raw() {
     //STUB
-    $this->stone->_data['content_raw'] .= "<h2>Organisations</h2>";
+    //$this->stone->_data['content_raw'] .= "<h2>Organisations</h2>";
     $this->add_existing_organisation_render_raw();
-    $this->stone->_data['content_raw'] .= "<h2>Persons</h2>";
+    //$this->stone->_data['content_raw'] .= "<h2>Persons</h2>";
     $this->add_existing_person_render_raw();
   }
 //------------------------------------------------------------------------------
@@ -178,8 +178,8 @@ class Customer extends Component {
 
     // handover wizard
     // TODO use same names, add person support
-    if (isset($this->stone->_data['organisationId'])) {
-      $this->addOrganisation($this->stone->_data['organisationId']);
+    if (isset($this->stone->Wizard->_data['organisationId'])) {
+      $this->addOrganisation($this->stone->Wizard->_data['organisationId']);
       $result['next_page'] = "done";
     }
 
@@ -191,6 +191,7 @@ class Customer extends Component {
   }
 //------------------------------------------------------------------------------
   function add_existing_organisation_render_raw() {
+    $this->stone->_data['content_raw'] .= "<h2>Organisations</h2>";
     $sth = $this->stone->pdo->prepare("SELECT organisation_id, organisation_name
                                        FROM organisation
                                        WHERE organisation_id NOT IN 
@@ -210,6 +211,7 @@ class Customer extends Component {
   }
 //------------------------------------------------------------------------------
   function add_existing_person_render_raw() {
+    $this->stone->_data['content_raw'] .= "<h2>Persons</h2>";
     //TODO: also check if a person is not linked to an organisation?
     //A person might be both individual and coorperate customer
     $sth = $this->stone->pdo->prepare("SELECT person_id ,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name) as person_name

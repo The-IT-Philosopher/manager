@@ -38,6 +38,7 @@ class Wizard extends Component {
 
   private $_pages = array();
    
+  private $_data = array();
 
 //------------------------------------------------------------------------------
   public function render() {
@@ -48,10 +49,11 @@ class Wizard extends Component {
   }
 //------------------------------------------------------------------------------
   public function process() {
-    if (!isset($this->_current_page)) $this->_current_page=$this->_init_page;
+    if (NULL==$this->_current_page) $this->_current_page=$this->_init_page;
 
     // TODO: rename $result as $result should be reserved for return values
       $result = call_user_func($this->_current_page['process']);
+
 
     if (isset($result['next_page'])) {
       if (isset($this->_pages[$result['next_page']])) {
@@ -76,10 +78,16 @@ class Wizard extends Component {
   }
 //------------------------------------------------------------------------------
   public function initPage($page) {
+    $this->_data = array();
     if (isset($this->_pages[$page])) {
-      $this->_init_page = $this->_pages[$page];
+      $this->_current_page = NULL;
+      $this->_init_page = $this->_pages[$page]; 
+      // DEBUG
+      //$this->stone->_data['content_raw'] .= "Setting init page to $page <br>";
     } else {
-      $this->stone->_data['error'] .= "Page $page not found<br>"; 
+      $this->_init_page = NULL;
+      $this->_current_page = NULL;
+      $this->stone->_data['error'] .= "Page $page not found<br>";
     }
   }
 //------------------------------------------------------------------------------

@@ -42,9 +42,20 @@ class Person extends Component {
   }
 
   function init() {
+
+    $this->stone->Page->registerPage(
+      array("persons" => array (
+        "process" => array( $this, "ProcessPage")
+      )));
+
+
     $this->stone->Wizard->registerPage(
       array("person_enter"=>array('render_raw'=> array($this, "person_enter_render_raw"), 
                                "process"   => array($this, "person_enter_process"))));
+  }
+
+  function ProcessPage() {
+    $this->stone->_data['content_raw'] .= "TODO PersonPage";
   }
 
   function person_enter_render_raw(){
@@ -71,7 +82,7 @@ class Person extends Component {
       $sth = $this->stone->pdo->prepare("INSERT INTO person (person_first_name, person_initials, person_last_name_prefix, person_last_name) VALUES (:person_first_name, :person_initials, :person_last_name_prefix, :person_last_name)");
       $sth->execute($insertData);
       $person_id = $this->stone->pdo->lastInsertId();
-      $this->stone->_data['personId'] = $person_id;
+      $this->stone->Wizard->_data['personId'] = $person_id;
       if (strlen($_POST['email_address'])) {
         $insertData = array();
         $insertData[":email_verification"]=sha1(mcrypt_create_iv(16), MCRYPT_DEV_URANDOM ); 
@@ -79,7 +90,7 @@ class Person extends Component {
         $sth = $this->stone->pdo->prepare("INSERT INTO email (email_address,email_verification) VALUES (:email_address,:email_verification)");
         $sth->execute($insertData);
         $email_id = $this->stone->pdo->lastInsertId();
-        $this->stone->_data['emailId'] = $email_id;
+        $this->stone->Wizard->_data['emailId'] = $email_id;
       }
       $result['next_page'] = $this->_donePage;
     } 
