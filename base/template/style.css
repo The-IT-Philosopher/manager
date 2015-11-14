@@ -1,0 +1,188 @@
+html, body {
+  font-family: Ubuntu, sans-serif;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0px;
+  padding: 0px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.container {
+  display: flex;
+  flex-flow: row nowrap; 
+  justify-content: space-around;
+  margin : 6px; 
+
+}
+
+.container > * {
+   padding: 6px; 
+}
+
+.header * .title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  /*
+  vertical-align: middle;  works on firefox, aligns top on chrome  
+  display: table-cell;
+  */
+}
+
+.header .right {
+  text-align: right;
+}
+
+.container .center, .main .left, .main .right {
+  /* border: 1px solid blue; */
+  border: 1px solid red; 
+  border-radius: 12px;
+  /* Firefox still doesn't support dotted border */
+}
+
+.spacer { width:100%}
+
+.main { flex: 1; }
+
+.copyright {
+  text-align:center;
+  font-size: 10px;
+}
+
+/* Colour settings */
+
+html {
+  /* background-color: #ddf;  */
+  background-color: #fdd;
+}
+
+.container .center, .main .left, .main .right {
+  /* background-color: #eef; */
+  background-color: #fee; 
+  overflow:auto; 
+}
+
+
+@media screen and (min-width: 1500px) {
+  .container .center { width: 1000px; }
+}
+
+
+@media screen and (min-width: 1400px) and (max-width: 1499px) {
+  .container .center { width: 900px; }
+}
+
+@media screen and (min-width: 1300px) and (max-width: 1399px) {
+  .container .center { width: 800px; }
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1299px) {
+  .container .center { width: 700px; }
+}
+
+@media screen and (min-width: 1100px) and (max-width: 1199px) {
+  .container .center { width: 600px; }
+}
+
+
+@media screen and (min-width: 1000px) and (max-width: 1099px) {
+  .container .center { width: 500px; }
+}
+
+@media screen and (min-width: 900px) and (max-width: 999px) {
+  .container .center { width: 500px; }
+}
+
+/* 980 */
+@media screen and (min-width: 980px) and (max-width: 980px) {
+  html { color : red; } /* some weird android case */
+} /* solved: viewport & initial zoom in meta tag */ 
+
+@media screen and (min-width: 1200px) {
+  .left, .right { width:200px; }
+  .header * img.logo, .header * .title  { height: 150px; }
+  .header * .title { min-width: 400px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 37px; }
+  .header * .title .slogan { font-size: 20px; }
+}
+
+
+@media screen and (min-width: 1100px) and (max-width: 1199px) {
+  .left, .right { width:175px; }
+  .header * img.logo, .header * .title  { height: 125px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 31px; }
+  .header * .title .slogan { font-size: 18px; }
+}
+
+
+@media screen and (min-width: 1000px) and (max-width: 1099px) {
+  .left, .right { width:175px; }
+  .header * img.logo, .header * .title  { height: 115px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 31px; }
+  .header * .title .slogan { font-size: 18px; }
+}
+
+
+@media screen and (min-width: 900px) and (max-width: 999px) {
+  .left, .right { width:150px; }
+  .header * img.logo, .header * .title  { height: 105px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 28px; }
+  .header * .title .slogan { font-size: 16px; }
+}
+
+@media screen and (min-width: 800px) and (max-width: 899px) {
+  .left, .right { width:150px; }
+  .header * img.logo, .header * .title  { height: 105px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 28px; }
+  .header * .title .slogan { font-size: 16px; }
+}
+
+
+
+@media screen and (min-width: 600px) and (max-width: 699px) {
+  /* we need different values, but just to be sure this is selected now */ 
+  .left, .right { width:150px; }
+  .header * img.logo, .header * .title  { height: 105px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 28px; }
+  .header * .title .slogan { font-size: 16px; }
+}
+
+
+@supports (touch-action: auto) {
+  /* Detect mobile device using css only */
+  /* experimental technology */
+  /* Microsoft Edge on a non-touch device also triggers this */
+  /* Chromium on non-touch devide as well */
+  /* Look up Media Quaries 4, there was something more usefull there*/
+  body { color : blue; }
+  /* Use @import and allow other cases to import it as well
+     That should be the default for any case above anyways
+  */
+}
+
+/*  TODO */
+@supports (display: flex) {}
+@supports not (display: flex) {}
+
+
+.content {
+  height: 0px; 
+  min-height: 100%;
+}
+
+/* DEBUGGING */
+.right { width:450px;  }
+
+.menu button {
+  width : 100%;
+}
