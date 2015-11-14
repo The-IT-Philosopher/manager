@@ -45,15 +45,31 @@ class Customer extends Component {
       array("Customer_add_existing"=>array(
                                'render_raw'    => array( $this, "add_existing_render_raw"), 
                                "process"       => array( $this, "add_existing_process"))));
+
+    $this->stone->Wizard->registerPage(
+      array("Customer_add_existing_organisation"=>array(
+                               'render_raw'    => array( $this, "add_existing_organisation_render_raw"), 
+                               "process"       => array( $this, "add_existing_process"))));
+
+    $this->stone->Wizard->registerPage(
+      array("Customer_add_existing_person"=>array(
+                               'render_raw'    => array( $this, "add_existing_person_render_raw"), 
+                               "process"       => array( $this, "add_existing_process"))));
+
   }
 //------------------------------------------------------------------------------
   function ProcessPage() {
     // we need propper rendering later .... 
-    $this->stone->_data['content_raw'] .= "<A href='addnew'><button>Nieuwe persoon/organisatie</button></a><a href='addexisting'><button>Bestaande persoon/organisatie</button></a>";
-    $this->stone->_data['content_raw'] .= "<A href='show'><button>Tonen</button></a><br>";
+    $this->stone->_data['content_raw'] .= "<A href='addnewperson'><button>Nieuwe Persoon</button></a>";
+    $this->stone->_data['content_raw'] .= "<A href='addneworganisation'><button>Nieuwe Organisatie</button></a>";
 
-    if ($this->stone->_request[1]=="addnew") {
-    $this->stone->_data['content_raw'] .= "todo (addnew)<br>";
+    $this->stone->_data['content_raw'] .= "<a href='addexistingperson'><button>Bestaande Persoon</button></a>";
+    $this->stone->_data['content_raw'] .= "<a href='addexistingorganisation'><button>Bestaande Organisatie</button></a>";
+
+    $this->stone->_data['content_raw'] .= "<A href='show'><button>Toon alle klanten</button></a><br>";
+
+    if ($this->stone->_request[1]=="addnewperson") {
+    $this->stone->_data['content_raw'] .= "todo (addnewperson)<br>";
 /*
       $this->stone->Wizard->initPage("Wizard_Organisation_ChooseCountry");
       $this->stone->Organisation->setDonePage("person_enter");
@@ -62,15 +78,30 @@ class Customer extends Component {
 */
     }
 
-    if ($this->stone->_request[1]=="addexisting") {
-//      $this->stone->_data['content_raw'] .= "todo (addexisting)<br>";
+    if ($this->stone->_request[1]=="addneworganisation") {
 
-      $this->stone->Wizard->initPage("Customer_add_existing");
+      //TODO MOVE DATA TO WIZARD, IMPLEMENT RESET
+      $this->stone->Wizard->initPage("Wizard_Organisation_ChooseCountry");
+      //TODO HANDOVER
+      $this->stone->Organisation->setDonePage("Customer_add_existing_organisation");
+      $this->stone->Wizard->process();    
+      $this->stone->Wizard->render();
+    }
+
+    if ($this->stone->_request[1]=="addexistingperson") {
+      $this->stone->Wizard->initPage("Customer_add_existing_person");
       $this->stone->Organisation->setDonePage("done");
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
-
     }
+
+    if ($this->stone->_request[1]=="addexistingorganisation") {
+      $this->stone->Wizard->initPage("Customer_add_existing_organisation");
+      $this->stone->Organisation->setDonePage("done");
+      $this->stone->Wizard->process();    
+      $this->stone->Wizard->render();
+    }
+
 
     if ($this->stone->_request[1]=="show") {
       $this->show();
@@ -107,11 +138,6 @@ class Customer extends Component {
     $sth->execute($insertData);
   }
 //------------------------------------------------------------------------------
-  function process() {
-
-
-  }
-//------------------------------------------------------------------------------
   function show() {
     $sth = $this->stone->pdo->prepare("SELECT customer_id, customer_name
                           FROM (SELECT customer_id,organisation_name as customer_name
@@ -143,12 +169,24 @@ class Customer extends Component {
     $result = array();
     if (isset($_POST['organisation_id'])) {
       $this->addOrganisation($_POST['organisation_id']);
-      $result['done_page'] = "done";
+      $result['next_page'] = "done";
     }
     if (isset($_POST['person_id'])) {
       $this->addPerson($_POST['person_id']);
-      $result['done_page'] = "done";
+      $result['next_page'] = "done";
     }
+
+    // handover wizard
+    // TODO use same names, add person support
+    if (isset($this->stone->_data['organisationId'])) {
+      $this->addOrganisation($this->stone->_data['organisationId']);
+      $result['next_page'] = "done";
+    }
+
+
+
+
+
     return $result;
   }
 //------------------------------------------------------------------------------

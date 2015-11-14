@@ -43,7 +43,7 @@ class Organisation extends Component {
 
     $this->stone->Page->registerPage(
       array("organisations" => array (
-        process => array( $this, "Wizard_Organisation_ProcessPage")
+        "process" => array( $this, "Wizard_Organisation_ProcessPage")
       )));
 
     $this->stone->Wizard->registerPage(
