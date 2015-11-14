@@ -35,7 +35,7 @@ namespace Philosopher;
 
 // TODO: rename so Wizard becomes a prefix
 // Also ... see how to create a good structure
-class Wizard_KvK extends Component {
+class KvK extends Component {
 
   private $_donePage = "done";
   

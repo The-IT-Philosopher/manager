@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-class RenderJSON extends Component implements Render {
+class RenderWML extends Component implements Render {
 
    const ContentType    = "text/vnd.wap.wml";
    const DefaultCharset  = "UTF-8";

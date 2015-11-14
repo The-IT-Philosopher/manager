@@ -60,10 +60,10 @@ try {
     $stone->registerComponent(new Wizard());
     $stone->registerComponent(new Page());
 
-    $stone->registerComponent(new Wizard_KvK());
-    $stone->registerComponent(new Wizard_VIES());
-    $stone->registerComponent(new Wizard_Organisation());
-    $stone->registerComponent(new Wizard_Person());
+    $stone->registerComponent(new KvK());
+    $stone->registerComponent(new VIES());
+    $stone->registerComponent(new Organisation());
+    $stone->registerComponent(new Person());
     $stone->registerComponent(new Test_Wizard());
     $stone->registerComponent(new DP_OverheidIO());
   //

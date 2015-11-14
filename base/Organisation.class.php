@@ -30,9 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-// TODO possibly rename the Wizard_ classes to just their name as we're starting to
-//      register pages etc as well
-class Wizard_Organisation extends Component {
+
+class Organisation extends Component {
 
   private $_donePage = "done";
   
@@ -75,7 +74,7 @@ class Wizard_Organisation extends Component {
 
     if ($this->stone->_request[1]=="add") {
       $this->stone->Wizard->initPage("Wizard_Organisation_ChooseCountry");
-      $this->stone->Wizard_Organisation->setDonePage("person_enter");
+      $this->stone->Organisation->setDonePage("person_enter");
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
     }
@@ -178,7 +177,7 @@ class Wizard_Organisation extends Component {
       if ($this->stone->_data['organisationCountry']=="NL") {
         if (! in_array( $this->stone->_data['organisationType'], array('in_formation','association_unregged') )) {
           // Dutch organisation registered by the KvK (Dutch Chamber of Commerce)
-          $Wizard_KvK = $this->stone->Wizard_KvK;
+          $Wizard_KvK = $this->stone->KvK;
           if ($Wizard_KvK) {
             $Wizard_KvK->setDonePage($this->_donePage);
             $result['next_page'] = "kvk_enter"; 
@@ -189,7 +188,7 @@ class Wizard_Organisation extends Component {
       } else if ($this->stone->_data['organisationCountryVIES']) {
         if (! in_array( $this->stone->_data['organisationType'], array('in_formation','association_unregged', 'association_regged') )) {
           // EU Organisation might have a tax number (Companies always have one, but foundations might not)
-          $Wizard_VIES = $this->stone->Wizard_VIES;
+          $Wizard_VIES = $this->stone->VIES;
           if ($Wizard_VIES) {
             $Wizard_VIES->setDonePage($this->_donePage);
             $result['next_page'] = "vies_enter"; 

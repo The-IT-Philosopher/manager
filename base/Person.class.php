@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 namespace Philosopher;
 
 
-class Wizard_Person extends Component {
+class Person extends Component {
 
   private $_donePage = "done";
   
