@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 14, 2015 at 04:23 PM
+-- Generation Time: Nov 14, 2015 at 08:00 PM
 -- Server version: 10.0.21-MariaDB-log
 -- PHP Version: 5.6.14
 
@@ -385,6 +385,18 @@ CREATE TABLE `email` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `linkxt_service2key`
+--
+
+CREATE TABLE `linkxt_service2key` (
+  `linkxt_service2key_id` int(11) NOT NULL,
+  `key_id` int(11) NOT NULL,
+  `service_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `link_address2organisation`
 --
 
@@ -446,6 +458,18 @@ CREATE TABLE `link_email2user` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `link_project2project`
+--
+
+CREATE TABLE `link_project2project` (
+  `link_project2project_id` int(11) NOT NULL,
+  `project_parent_id` int(11) NOT NULL,
+  `project_child_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `link_session2user`
 --
 
@@ -464,7 +488,7 @@ CREATE TABLE `link_session2user` (
 CREATE TABLE `organisation` (
   `organisation_id` int(11) NOT NULL,
   `organisation_name` varchar(512) NOT NULL,
-  `organisation_type` enum('association_unregged','association_regged','foundation','company','other') NOT NULL,
+  `organisation_type` enum('in_formation','association_unregged','association_regged','foundation','company','other') NOT NULL,
   `organisation_vat` varchar(128) NOT NULL COMMENT 'EU vat number',
   `organisation_nl_kvk` int(11) NOT NULL COMMENT 'Dutch KvK nummer',
   `organisation_country` varchar(2) NOT NULL COMMENT 'ISO 3166-1 alpha2'
@@ -496,8 +520,8 @@ CREATE TABLE `project` (
   `project_description_long` varchar(2048) NOT NULL,
   `project_billing_rate` int(11) NOT NULL COMMENT 'smallest unit in currency (cents)',
   `project_billing_currency` char(3) NOT NULL DEFAULT 'EUR',
-  `project_billing_type` enum('timed','fixed') NOT NULL DEFAULT 'timed',
-  `project_status` enum('planned','running','finished','') NOT NULL DEFAULT 'planned'
+  `project_billing_type` enum('inherit','free','timed','fixed') NOT NULL DEFAULT 'timed',
+  `project_status` enum('negotiation','planned','running','finished','cancelled') NOT NULL DEFAULT 'planned'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -535,12 +559,79 @@ CREATE TABLE `session` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `supplier`
+--
+
+CREATE TABLE `supplier` (
+  `supplier_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user`
 --
 
 CREATE TABLE `user` (
   `user_id` int(11) NOT NULL,
   `user_pbkdf2` char(77) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `xt_key`
+--
+
+CREATE TABLE `xt_key` (
+  `xt_key_id` int(11) NOT NULL,
+  `xt_key_val1` varchar(512) NOT NULL,
+  `xt_key_val2` varchar(512) NOT NULL,
+  `xt_key_val3` varchar(512) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `xt_pre_service`
+--
+
+CREATE TABLE `xt_pre_service` (
+  `external_service_id` int(11) NOT NULL,
+  `external_service_type` varchar(64) NOT NULL,
+  `external_service_name` varchar(64) NOT NULL,
+  `external_service_url1` varchar(512) DEFAULT NULL,
+  `external_service_url2` varchar(512) DEFAULT NULL,
+  `external_service_url3` varchar(512) DEFAULT NULL,
+  `external_service_url4` varchar(512) DEFAULT NULL,
+  `external_service_url5` varchar(512) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `xt_service`
+--
+
+CREATE TABLE `xt_service` (
+  `xt_service_id` int(11) NOT NULL,
+  `xt_service_type` varchar(64) NOT NULL,
+  `xt_service_name` varchar(64) NOT NULL,
+  `xt_service_url1` varchar(512) DEFAULT NULL,
+  `xt_service_url2` varchar(512) DEFAULT NULL,
+  `xt_service_url3` varchar(512) DEFAULT NULL,
+  `xt_service_url4` varchar(512) DEFAULT NULL,
+  `xt_service_url5` varchar(512) DEFAULT NULL,
+  `xt_service_method1` enum('OPTIONS','GET','HEAD','POST','PUT','DELETE','TRACE','CONNECT') DEFAULT NULL COMMENT 'Method for URL1',
+  `xt_service_method2` enum('OPTIONS','GET','HEAD','POST','PUT','DELETE','TRACE','CONNECT') DEFAULT NULL COMMENT 'Method for URL2',
+  `xt_service_method3` enum('OPTIONS','GET','HEAD','POST','PUT','DELETE','TRACE','CONNECT') DEFAULT NULL COMMENT 'Method for URL3',
+  `xt_service_method4` enum('OPTIONS','GET','HEAD','POST','PUT','DELETE','TRACE','CONNECT') DEFAULT NULL COMMENT 'Method for URL4',
+  `xt_service_method5` enum('OPTIONS','GET','HEAD','POST','PUT','DELETE','TRACE','CONNECT') DEFAULT NULL COMMENT 'Method for URL5',
+  `xt_service_cc1` varchar(64) DEFAULT NULL COMMENT 'Content-Type for URL1',
+  `xt_service_cc2` varchar(64) DEFAULT NULL COMMENT 'Content-Type for URL2',
+  `xt_service_cc3` varchar(64) DEFAULT NULL COMMENT 'Content-Type for URL3',
+  `xt_service_cc4` varchar(64) DEFAULT NULL COMMENT 'Content-Type for URL4',
+  `xt_service_cc5` varchar(64) DEFAULT NULL COMMENT 'Content-Type for URL5'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -590,6 +681,12 @@ ALTER TABLE `email`
   ADD PRIMARY KEY (`email_id`);
 
 --
+-- Indexes for table `linkxt_service2key`
+--
+ALTER TABLE `linkxt_service2key`
+  ADD PRIMARY KEY (`linkxt_service2key_id`);
+
+--
 -- Indexes for table `link_address2organisation`
 --
 ALTER TABLE `link_address2organisation`
@@ -623,6 +720,12 @@ ALTER TABLE `link_customer2project`
 --
 ALTER TABLE `link_email2user`
   ADD PRIMARY KEY (`link_email2user_id`);
+
+--
+-- Indexes for table `link_project2project`
+--
+ALTER TABLE `link_project2project`
+  ADD PRIMARY KEY (`link_project2project_id`);
 
 --
 -- Indexes for table `link_session2user`
@@ -666,10 +769,36 @@ ALTER TABLE `session`
   ADD KEY `session_hash` (`session_hash`);
 
 --
+-- Indexes for table `supplier`
+--
+ALTER TABLE `supplier`
+  ADD PRIMARY KEY (`supplier_id`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`user_id`);
+
+--
+-- Indexes for table `xt_key`
+--
+ALTER TABLE `xt_key`
+  ADD PRIMARY KEY (`xt_key_id`);
+
+--
+-- Indexes for table `xt_pre_service`
+--
+ALTER TABLE `xt_pre_service`
+  ADD PRIMARY KEY (`external_service_id`),
+  ADD KEY `external_service_type` (`external_service_type`);
+
+--
+-- Indexes for table `xt_service`
+--
+ALTER TABLE `xt_service`
+  ADD PRIMARY KEY (`xt_service_id`),
+  ADD KEY `external_service_type` (`xt_service_type`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -679,82 +808,112 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `address`
 --
 ALTER TABLE `address`
-  MODIFY `address_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `address_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `capability`
 --
 ALTER TABLE `capability`
-  MODIFY `capability_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `capability_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `country_vies`
 --
 ALTER TABLE `country_vies`
-  MODIFY `country_vies_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `country_vies_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `email`
 --
 ALTER TABLE `email`
-  MODIFY `email_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `email_id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `linkxt_service2key`
+--
+ALTER TABLE `linkxt_service2key`
+  MODIFY `linkxt_service2key_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `link_address2organisation`
 --
 ALTER TABLE `link_address2organisation`
-  MODIFY `link_address2organisation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `link_address2organisation_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `link_customer2organisation`
 --
 ALTER TABLE `link_customer2organisation`
-  MODIFY `link_customer2organisation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `link_customer2organisation_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `link_customer2project`
 --
 ALTER TABLE `link_customer2project`
-  MODIFY `link_project2organisation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `link_project2organisation_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `link_email2user`
 --
 ALTER TABLE `link_email2user`
-  MODIFY `link_email2user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `link_email2user_id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `link_project2project`
+--
+ALTER TABLE `link_project2project`
+  MODIFY `link_project2project_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `link_session2user`
 --
 ALTER TABLE `link_session2user`
-  MODIFY `link_session2user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `link_session2user_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `organisation`
 --
 ALTER TABLE `organisation`
-  MODIFY `organisation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `organisation_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `person`
 --
 ALTER TABLE `person`
-  MODIFY `person_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `person_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `project`
 --
 ALTER TABLE `project`
-  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `project_hours`
 --
 ALTER TABLE `project_hours`
-  MODIFY `project_hours_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `project_hours_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `session`
 --
 ALTER TABLE `session`
-  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `supplier`
+--
+ALTER TABLE `supplier`
+  MODIFY `supplier_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `xt_key`
+--
+ALTER TABLE `xt_key`
+  MODIFY `xt_key_id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `xt_pre_service`
+--
+ALTER TABLE `xt_pre_service`
+  MODIFY `external_service_id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `xt_service`
+--
+ALTER TABLE `xt_service`
+  MODIFY `xt_service_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- Constraints for dumped tables
 --
