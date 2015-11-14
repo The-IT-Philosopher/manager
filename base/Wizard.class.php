@@ -44,8 +44,12 @@ class Wizard extends Component {
   public function render() {
     // STUB
     if (!isset($this->_current_page)) $this->_current_page=$this->_init_page;
-    $form = call_user_func($this->_current_page['render_raw']);
-    $this->stone->_data['content_raw'] .= $form;
+    if (isset($this->_current_page['render_raw'])) {
+      $form = call_user_func($this->_current_page['render_raw']);
+      $this->stone->_data['content_raw'] .= $form;
+    } else {
+      $this->stone->_data['content_raw'] .= "Wizard Error: page not set";
+    }
   }
 //------------------------------------------------------------------------------
   public function process() {
@@ -61,6 +65,7 @@ class Wizard extends Component {
       if ($result['next_page']=="done") {
         $this->stone->_data['content_raw'] .= "done";
         $this->_current_page = NULL;
+        $this->_data = array();
       } else
       if (isset($this->_pages[$result['next_page']])) {
         $this->_current_page = $this->_pages[$result['next_page']];
