@@ -61,8 +61,8 @@ class Stone {
 
   // Should the uid/cap remain here or be moves to a user class?
   // As they are essential to the system, they might remain here, for now.
-  private $uid;
-  private $cap;
+  private $uid = 0;
+  private $cap = array();
 
   public function setUserID($uid) {
     $this->uid = $uid;
@@ -101,7 +101,7 @@ class Stone {
         $this->databaseConnection = $component;
         $this->pdo = $component->connect();
       }
-      if ($component instanceof AuthSession) $component->resume();
+      if ($component instanceof Session) $component->resume();
 
       return true;
     } catch (\Exception $e) {
@@ -117,7 +117,7 @@ class Stone {
 
     // TODO register pages
     if ($this->_request[0]=="logout") {
-      $this->AuthSession->terminate();
+      $this->Session->terminate();
       //reset session
       session_destroy();
       $_SESSION = array();

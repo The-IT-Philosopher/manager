@@ -30,9 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-interface Auth {
-
-
+class Auth extends Component {
 
 }
 

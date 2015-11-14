@@ -56,7 +56,9 @@ try {
     $_SESSION['stone']=$stone;
     $stone->registerComponent(new RenderHTML5());
     $stone->registerComponent(new DatabaseConnection());
-    $stone->registerComponent(new AuthSession());
+    $stone->registerComponent(new Auth());
+    $stone->registerComponent(new AuthLocal());
+    $stone->registerComponent(new Session());
     $stone->registerComponent(new Wizard());
     $stone->registerComponent(new Page());
 

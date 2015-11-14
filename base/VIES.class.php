@@ -77,7 +77,7 @@ class VIES extends Component {
       $vat_number = $this->stone->Wizard->_data['organisationCountry'] . $vat_number;
     }
 
-    $this->stone->_data['content_raw'] .= "<br>vat nr = $vat_number <br>";
+    //$this->stone->_data['content_raw'] .= "<br>vat nr = $vat_number <br>";
     //TODO :: Integrate this class into new autoloader stucture
     //        Set up GIT with submodules
 

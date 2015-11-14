@@ -38,11 +38,11 @@ class Person extends Component {
   private $_donePage = "done";
   
   function setDonePage($donepage) {
-    $this->_donePage=$donepage;
+      $this->_donePage=$donepage;
   }
 
   function init() {
-
+    
     $this->stone->Page->registerPage(
       array("persons" => array (
         "process" => array( $this, "ProcessPage")

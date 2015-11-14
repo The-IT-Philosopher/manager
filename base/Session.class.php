@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 namespace Philosopher;
 
-class AuthSession extends Component {
+class Session extends Component {
 
   function resume() {
   if (isset($_COOKIE['ItPhilManagerSession'])) {

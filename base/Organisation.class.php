@@ -152,8 +152,9 @@ class Organisation extends Component {
   }
 
   function Wizard_Organisation_ChooseCountryEU_process(){
-    $result = array("next_page"=>"Wizard_Organisation_ChooseOrganisationType");
+    $result = array();
     if (isset($_POST['country'])) {
+      $result["next_page"]="Wizard_Organisation_ChooseOrganisationType";
       $this->stone->Wizard->_data['organisationCountry'] = $_POST['country'];
       $this->stone->Wizard->_data['organisationCountryVIES'] = 1;
     }
@@ -161,8 +162,9 @@ class Organisation extends Component {
   }
 
   function Wizard_Organisation_ChooseCountryNOTEU_process(){
-    $result = array("next_page"=>"Wizard_Organisation_ChooseOrganisationType");
+    $result = array();
     if (isset($_POST['country'])) {
+      $result["next_page"]="Wizard_Organisation_ChooseOrganisationType";
       $this->stone->Wizard->_data['organisationCountry'] = $_POST['country'];
       $this->stone->Wizard->_data['organisationCountryVIES'] = 0;
     }
@@ -190,6 +192,8 @@ class Organisation extends Component {
           // EU Organisation might have a tax number (Companies always have one, but foundations might not)
           $Wizard_VIES = $this->stone->VIES;
           if ($Wizard_VIES) {
+            // TODO : first enter name/address
+            //        then invoke VIES
             $Wizard_VIES->setDonePage($this->_donePage);
             $result['next_page'] = "vies_enter"; 
           } else {

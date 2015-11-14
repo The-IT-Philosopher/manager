@@ -38,7 +38,7 @@ class Wizard extends Component {
 
   private $_pages = array();
    
-  private $_data = array();
+  public $_data = array();
 
 //------------------------------------------------------------------------------
   public function render() {
@@ -54,12 +54,15 @@ class Wizard extends Component {
     // TODO: rename $result as $result should be reserved for return values
       $result = call_user_func($this->_current_page['process']);
 
+    //DEBUG
+    //$this->stone->_data['content_raw'] .= "<pre>Result = \n" . var_export($result,1) . "</pre>";
 
     if (isset($result['next_page'])) {
       if (isset($this->_pages[$result['next_page']])) {
         $this->_current_page = $this->_pages[$result['next_page']];
       } else {
         $this->stone->_data['error'] .= "Retrieved next page not found"; 
+
       }
     } else {
     }
@@ -78,6 +81,9 @@ class Wizard extends Component {
   }
 //------------------------------------------------------------------------------
   public function initPage($page) {
+
+    if ($this->_init_page == $this->_pages[$page]) return;
+
     $this->_data = array();
     if (isset($this->_pages[$page])) {
       $this->_current_page = NULL;
