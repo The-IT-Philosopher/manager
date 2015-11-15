@@ -226,9 +226,9 @@ class Project extends Component {
 //------------------------------------------------------------------------------
   function declareWizard_chooseproject_process(){
     $result = array();
-    if (isset($_POST['declareProject'])){
+    if (isset($_POST['project_id'])){
       $result['next_page']="declareWizard_declaretime";
-      $this->stone->Wizard->_data['projectId'] = $_POST['declareProject'];
+      $this->stone->Wizard->_data['projectId'] = $_POST['project_id'];
     } 
     return $result;
   }
