@@ -61,6 +61,7 @@ try {
     $stone->registerComponent(new Session());
     $stone->registerComponent(new Wizard());
     $stone->registerComponent(new Page());
+//    $stone->registerComponent(new Form()); // Form is not to be a component class ...
 
     $stone->registerComponent(new KvK());
     $stone->registerComponent(new VIES());

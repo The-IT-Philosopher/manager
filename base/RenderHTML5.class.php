@@ -42,7 +42,14 @@ class RenderHTML5 extends Component implements Render {
 
     $template_url = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__."/template/");
     $output = str_replace("{template_path}",$template_url,$output);
-    $output = str_replace("{main_center}",$data['content_raw'],$output);
+
+
+    $main_center = "<div><P>content_raw</P>" . $data['content_raw'] . "</DIV>";
+    foreach ($data['content_xml'] as $xml)
+      $main_center .= "<div><P>content_xml</P>" . $this->xml2html($xml) . "</DIV>";
+    $output = str_replace("{main_center}",$main_center,$output);
+
+
     $output = str_replace("{html_title}",$data['title'], $output);   
 
     $output = str_replace("{main_right}",$data['content_right_raw'],$output);
@@ -58,7 +65,27 @@ class RenderHTML5 extends Component implements Render {
 
     echo $output;
   }
+//------------------------------------------------------------------------------
+// code from bswpbase
+  function xml2html($xmlroot) {
+    $dom_xml = dom_import_simplexml($xmlroot);
+    if (!$dom_xml) {
+      // TODO handle this error condition
+      return;
+    }
+    $dom = new \DOMDocument();
+    $dom_xml = $dom->importNode($dom_xml, true);
+    $dom_xml = $dom->appendChild($dom_xml);
 
+    if (-1==version_compare(phpversion(),"5.3.6")) {
+      $html = $dom->saveHTML();
+    } else {
+      $html = $dom->saveHTML($dom_xml);
+    }
+    return $html;
+
+  }
+//------------------------------------------------------------------------------
 }
 
 ?>

@@ -48,6 +48,7 @@ class Organisation extends Component {
 
     $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseCountry"=>array(
+                               'render_xml'    => array( $this, "Wizard_Organisation_ChooseCountry_render_xml"), 
                                'render_raw'    => array( $this, "Wizard_Organisation_ChooseCountry_render_raw"), 
                                "process"       => array( $this, "Wizard_Organisation_ChooseCountry_process"))));
 
@@ -92,6 +93,17 @@ class Organisation extends Component {
     $result .= "<button name=region value=NOTEU>Buiten EU</button>";
     $result .= "</form>";
     return $result;
+  }
+
+  function Wizard_Organisation_ChooseCountry_render_xml(){
+    $form = new Form();
+    //FormElement($name, $title, $type="text", $required=false, $default=null)
+    // we don't really have button support with pre-set values
+    // perhaps the "default" value will work, otherwise this needs to be changed
+    $form->addElement(new FormElement("country","Nederland", "button", false, "NL"));
+    $form->addElement(new FormElement("region","EU", "button", false, "EU"));
+    $form->addElement(new FormElement("region","Buiten EU", "button", false, "NOTEU"));
+    return $form->GenerateForm(NULL, "Kies land", true);
   }
 
   function Wizard_Organisation_ChooseCountryEU_render_raw(){
