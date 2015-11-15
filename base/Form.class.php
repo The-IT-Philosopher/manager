@@ -56,68 +56,78 @@ class Form {
     $xmltable = $xmlform->addChild("table");  
     
     foreach ($this->_elements as $element) {
-      $xmlrow = $xmltable->addChild("tr");
-      $xmlrow->addChild("th", $element->title);
-      switch ($element->type) {
-        case "select":
-          $xmloption = $xmlrow->addChild("td")->addChild("select");
-          foreach($element->options as $opt) {
-            $xmlselectoption=$xmloption->addChild("option", $opt->display);
-            $xmlselectoption->addAttribute("value",$opt->value);
-        // TODO values will be turned into array later
-            if ($values && $values[$element->name]) {
-              if ($values[$element->name]==$opt->value) $xmlselectoption->addAttribute("selected",true);
-            } else
-            if ($element->default==$opt->value) $xmlselectoption->addAttribute("selected",true);
-          } 
-          break;
-        case "textarea":
-          if ($values && isset($values[$element->name])) {
-            $xmloption = $xmlrow->addChild("td")->addChild("textarea",$values[$element->name]);      
-          } else {
-            $xmloption = $xmlrow->addChild("td")->addChild("textarea");
-          }
-          break;
-        case "checkbox":
-          $xmltd = $xmlrow->addChild("td");
-          $xmlhiddenoption=$xmltd->addChild("input");
-          $xmlhiddenoption->addAttribute("type","hidden");
-          $xmlhiddenoption->addAttribute("value","0");
-          $xmlhiddenoption->addAttribute("name",$element->name);
-          $xmlhiddenoption->addAttribute("id",$element->name."_hidden");    
-          $xmloption=$xmltd->addChild("input");
-          $xmloption->addAttribute("type","checkbox");
-          $xmloption->addAttribute("value","1");
-          if ($values) { 
-            if (isset($values[$element->name]) && $values[$element->name]) 
-              $xmloption->addAttribute("checked","true");
-          } elseif ($element->default==true) {
-            $xmloption->addAttribute("checked",true);
-          }
-          break;
-        default:
-          $xmloption = $xmlrow->addChild("td")->addChild("input");
-          $xmloption->addAttribute("type",$element->type);
-          if ($values) {
-            if(isset($values[$element->name])) {
-              $xmloption->addAttribute("value",$values[$element->name]);      
+      if ($element instanceof FormInputElement) {
+        $xmlrow = $xmltable->addChild("tr");
+        $xmlrow->addChild("th", $element->title);
+        switch ($element->type) {
+          case "select":
+            $xmloption = $xmlrow->addChild("td")->addChild("select");
+            foreach($element->options as $opt) {
+              $xmlselectoption=$xmloption->addChild("option", $opt->display);
+              $xmlselectoption->addAttribute("value",$opt->value);
+          // TODO values will be turned into array later
+              if ($values && $values[$element->name]) {
+                if ($values[$element->name]==$opt->value) $xmlselectoption->addAttribute("selected",true);
+              } else
+              if ($element->default==$opt->value) $xmlselectoption->addAttribute("selected",true);
+            } 
+            break;
+          case "textarea":
+            if ($values && isset($values[$element->name])) {
+              $xmloption = $xmlrow->addChild("td")->addChild("textarea",$values[$element->name]);      
+            } else {
+              $xmloption = $xmlrow->addChild("td")->addChild("textarea");
             }
-          } elseif ($element->default) $xmloption->addAttribute("value",$element->default); 
+            break;
+          case "checkbox":
+            $xmltd = $xmlrow->addChild("td");
+            $xmlhiddenoption=$xmltd->addChild("input");
+            $xmlhiddenoption->addAttribute("type","hidden");
+            $xmlhiddenoption->addAttribute("value","0");
+            $xmlhiddenoption->addAttribute("name",$element->name);
+            $xmlhiddenoption->addAttribute("id",$element->name."_hidden");    
+            $xmloption=$xmltd->addChild("input");
+            $xmloption->addAttribute("type","checkbox");
+            $xmloption->addAttribute("value","1");
+            if ($values) { 
+              if (isset($values[$element->name]) && $values[$element->name]) 
+                $xmloption->addAttribute("checked","true");
+            } elseif ($element->default==true) {
+              $xmloption->addAttribute("checked",true);
+            }
+            break;
+          default:
+            $xmloption = $xmlrow->addChild("td")->addChild("input");
+            $xmloption->addAttribute("type",$element->type);
+            if ($values) {
+              if(isset($values[$element->name])) {
+                $xmloption->addAttribute("value",$values[$element->name]);      
+              }
+            } elseif ($element->default) $xmloption->addAttribute("value",$element->default); 
+        }
+        $xmloption->addAttribute("name",$element->name);
+        $xmloption->addAttribute("id",$element->name);    
+        //if ($element->required==true) $xmloption->addAttribute("required",true);
+        // required doesn't seem to work as desired? disable it for now.
+      } else if ($element instanceof FormButtonElement) {
+        $xmlrow = $xmltable->addChild("tr");
+        $xmlrow->addChild("th");
+        $xmlbutton = $xmlrow->addChild("td")->addChild("button", $element->title);
+        $xmlbutton->addAttribute("value",$element->value);
+        $xmlbutton->addAttribute("name",$element->name);
+        $xmlbutton->addAttribute("id",$element->name);    
       }
-      $xmloption->addAttribute("name",$element->name);
-      $xmloption->addAttribute("id",$element->name);    
-      //if ($element->required==true) $xmloption->addAttribute("required",true);
-      // required doesn't seem to work as desired? disable it for now.
     }
 
 
-    if (!hide) {
+    if (!$hide) {
       if ($buttonTitle==NULL) $buttonTitle="Save";
       $xmlSaveButton = $xmlform->addChild("button", $buttonTitle);
       if ($buttonID==NULL) $buttonID = "save";
       $xmlSaveButton->addAttribute("id", $buttonID);
       $xmlSaveButton->addAttribute("name", $buttonID);
     }
+
     $xmlCancelButton = $xmlform->addChild("button", "Cancel");
     $xmlCancelButton->addAttribute("id",   "cancel");
     $xmlCancelButton->addAttribute("name", "cancel");
@@ -130,7 +140,7 @@ class Form {
 }
 //------------------------------------------------------------------------------
 // code from bswpbase
-class FormElement {
+class FormInputElement {
 	public $title;
 	public $name;
 	public $type;
@@ -150,8 +160,21 @@ class FormElement {
 	}
 }
 //------------------------------------------------------------------------------
+class FormButtonElement {
+	public $name;
+	public $title;
+	public $value;
+	public $type;
+  function __construct($name, $title, $value, $type="submit"){
+		$this->name=$name;
+		$this->title=$title;
+		$this->value=$value;
+		$this->type=$type;
+  }
+}
+//------------------------------------------------------------------------------
 // code from bswpbase
-class FormSelectElement{
+class FormSelectOptionElement{
 	public $value;
 	public $display;
 	function __construct($value, $display) {
