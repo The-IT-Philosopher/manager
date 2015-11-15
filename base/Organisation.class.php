@@ -120,7 +120,6 @@ class Organisation extends Component {
   }
 //------------------------------------------------------------------------------
 function Wizard_Organisation_ChooseCountryEU_render_xml(){
-  //STUB
     $sth  = $this->stone->pdo->prepare("SELECT alpha2, langNL FROM country where alpha2 IN (SELECT alpha2 from country_vies) ORDER BY langNL"); 
     $sth->execute();
     $form = new Form();
@@ -146,7 +145,6 @@ function Wizard_Organisation_ChooseCountryEU_render_xml(){
   }
 //------------------------------------------------------------------------------
 function Wizard_Organisation_ChooseCountryNOTEU_render_xml(){
-  //STUB
     $sth  = $this->stone->pdo->prepare("SELECT alpha2, langNL FROM country where alpha2 NOT IN (SELECT alpha2 from country_vies) ORDER BY langNL"); 
     $sth->execute();
     $form = new Form();

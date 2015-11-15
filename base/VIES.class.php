@@ -34,13 +34,13 @@ namespace Philosopher;
 
 
 class VIES extends Component {
-
+//------------------------------------------------------------------------------
   private $_donePage = "done";
   
   function setDonePage($donepage) {
     $this->_donePage=$donepage;
   }
-
+//------------------------------------------------------------------------------
   function init() {
     $this->stone->Wizard->registerPage(
       array("vies_enter"=>array('render_raw'=> array($this, "vies_enter_render_raw"), 
@@ -50,7 +50,7 @@ class VIES extends Component {
       array("vies_ok"=>array('render_raw'=> array($this, "vies_ok_render_raw"), 
                                "process" => array($this, "vies_ok_process"))));
   }
-
+//------------------------------------------------------------------------------
   function vies_enter_render_raw(){
     $result  = "<form method=post>";
     $result .= "<table>";
@@ -59,14 +59,20 @@ class VIES extends Component {
     $result .= "</table></form>";
     return $result;
   }
-
+//------------------------------------------------------------------------------
+  function vies_enter_render_xml(){
+    $form = new Form();
+    $form->addElement(new FormInputElement("vat","BTW Nummer"));
+    return $form->GenerateForm(NULL, "Voer BTW nummer in", true);
+  }
+//------------------------------------------------------------------------------
   function vies_ok_render_raw(){
     $result  = "<PRE>DATA FROM VIES\n";
     $result .= var_export($this->stone->Wizard->_data['viesData'],true);
     $result .= "</PRE>";
     return $result;
   }
-
+//------------------------------------------------------------------------------
   function vies_enter_process() {
     $result = array();
     if (!isset($_POST)) return $result;
@@ -77,11 +83,10 @@ class VIES extends Component {
       $vat_number = $this->stone->Wizard->_data['organisationCountry'] . $vat_number;
     }
 
-    //$this->stone->_data['content_raw'] .= "<br>vat nr = $vat_number <br>";
+
+
     //TODO :: Integrate this class into new autoloader stucture
     //        Set up GIT with submodules
-
-    //return; //DEBUG
     require_once("components/vat-validation/vatValidation.class.php");
     $vat_validator = new \vatValidation();
 
@@ -94,11 +99,11 @@ class VIES extends Component {
       //                      other information is inconsequent between states
       $this->stone->Wizard->_data['viesData'] = $vatData;
       //$data['content_raw'] .= "<pre>VIES DATA\n" . var_export($vatData,true) . "</pre>";
-      /*      
+      /*            
       $sth = $pdo->prepare("UPDATE organisation 
                             SET    organisation_vat = :organisation_vat 
                             WHERE  organisation_id  = :organisation_id");
-      $sth->execute(array(":organisation_vat" => $_POST['vat'], "organisation_id" => $_SESSION['CustomerAddWizard']['organisationId'] ));
+      $sth->execute(array(":organisation_vat" => $vat_number, "organisation_id" => $this->stone->Wizard->_data['organisationId']  ));
       */
       $result['next_page'] = "vies_ok"; //debug
     } else {
@@ -109,6 +114,6 @@ class VIES extends Component {
 
   return $result;
   }
-
+//------------------------------------------------------------------------------
 
 }

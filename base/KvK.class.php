@@ -36,23 +36,24 @@ namespace Philosopher;
 // TODO: rename so Wizard becomes a prefix
 // Also ... see how to create a good structure
 class KvK extends Component {
-
+//------------------------------------------------------------------------------
   private $_donePage = "done";
   
   function setDonePage($donepage) {
     $this->_donePage=$donepage;
   }
-
+//------------------------------------------------------------------------------
   function init() {
     $this->stone->Wizard->registerPage(
       array("kvk_enter"=>array('render_raw'=> array($this, "kvk_enter_render_raw"), 
+                               'render_xml'=> array($this, "kvk_enter_render_xml"), 
                                "process"   => array($this, "kvk_enter_process"))));
 
     $this->stone->Wizard->registerPage(
       array("kvk_ok"=>array('render_raw'=> array($this, "kvk_ok_render_raw"), 
                                "process" => array($this, "kvk_ok_process"))));
   }
-
+//------------------------------------------------------------------------------
   function kvk_enter_render_raw(){
     $result  = "<form method=post>";
     $result .= "<table>";
@@ -61,14 +62,20 @@ class KvK extends Component {
     $result .= "</table></form>";
     return $result;
   }
-
+//------------------------------------------------------------------------------
+  function kvk_enter_render_xml(){
+    $form = new Form();
+    $form->addElement(new FormInputElement("kvk","KvK Nummer", "number"));
+    return $form->GenerateForm(NULL, "Voer KvK nummer in", true);
+  }
+//------------------------------------------------------------------------------
   function kvk_ok_render_raw(){
     $result  = "<PRE>DATA FROM OPENOVERHEID.IO\n";
     $result .= var_export($this->stone->Wizard->_data['kvkData'],true);
     $result .= "</PRE>";
     return $result;
   }
-
+//------------------------------------------------------------------------------
   function kvk_enter_process() {
     $result = array();
     if (!isset($_POST)) return $result;
@@ -124,6 +131,6 @@ class KvK extends Component {
     }
     return $result;
   }
-
+//------------------------------------------------------------------------------
 
 }
