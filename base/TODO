@@ -1,20 +1,36 @@
-*  Port and integrate all wizards
+== Projects ==
 
-    -- We can add an organisation (KvK link only, TODO: Address wizard)
-    -- TODO: add person to organisation
+* Show Project Info
+* Edit Project Info
+* Sub Projects
+* Hours overview --> Billing
+* Start/End date
 
-*  Address wizard 
-   -- Postcode API intergation
+== Billing ==
 
-*  Generate forms by code (port code from BlaatBase?) (HTML renderer)
+* Invoice generation --> Address
+* Payment Provider Integration
+
+== Address ==
+
+* Create Address Wizard
+* Postcode support --> DataProvider Interface Defintion
+
+== Organisations == 
+
+* Port support for manually entered organisations
+* Integrate VIES support for applicable organisations
+
+== Person ==
+
+* Integrate Person Pages/Wizards
+
+
+================================================================================
+
+*  More rewrites of the rendering code
 
 *  Better login/logout (re-check permissions after login so no refresh needed)
-
-*  Sub projects
-
-*  Invoice generation
-
-*  Payment provider integration
 
 *  Recover __wakeup when client has outdates information in his session
 
