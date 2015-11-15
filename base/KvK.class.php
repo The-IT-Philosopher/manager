@@ -45,35 +45,16 @@ class KvK extends Component {
 //------------------------------------------------------------------------------
   function init() {
     $this->stone->Wizard->registerPage(
-      array("kvk_enter"=>array('render_raw'=> array($this, "kvk_enter_render_raw"), 
+      array("kvk_enter"=>array( 
                                'render_xml'=> array($this, "kvk_enter_render_xml"), 
                                "process"   => array($this, "kvk_enter_process"))));
 
-    $this->stone->Wizard->registerPage(
-      array("kvk_ok"=>array('render_raw'=> array($this, "kvk_ok_render_raw"), 
-                               "process" => array($this, "kvk_ok_process"))));
-  }
-//------------------------------------------------------------------------------
-  function kvk_enter_render_raw(){
-    $result  = "<form method=post>";
-    $result .= "<table>";
-    $result .= "<tr><td>KvK Nummer</td><td><input type=number name=kvk></td></tr>";
-    $result .= "<tr><td></td><td><input type=submit value=volgense></td></tr>";
-    $result .= "</table></form>";
-    return $result;
   }
 //------------------------------------------------------------------------------
   function kvk_enter_render_xml(){
     $form = new Form();
     $form->addElement(new FormInputElement("kvk","KvK Nummer", "number"));
     return $form->GenerateForm(NULL, "Voer KvK nummer in", true);
-  }
-//------------------------------------------------------------------------------
-  function kvk_ok_render_raw(){
-    $result  = "<PRE>DATA FROM OPENOVERHEID.IO\n";
-    $result .= var_export($this->stone->Wizard->_data['kvkData'],true);
-    $result .= "</PRE>";
-    return $result;
   }
 //------------------------------------------------------------------------------
   function kvk_enter_process() {

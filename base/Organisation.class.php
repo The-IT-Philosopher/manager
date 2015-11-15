@@ -49,24 +49,20 @@ class Organisation extends Component {
     $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseCountry"=>array(
                                'render_xml'    => array( $this, "Wizard_Organisation_ChooseCountry_render_xml"), 
-                               'render_raw'    => array( $this, "Wizard_Organisation_ChooseCountry_render_raw"), 
                                "process"       => array( $this, "Wizard_Organisation_ChooseCountry_process"))));
 
     $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseCountryEU"=>array(
                                'render_xml' => array( $this, "Wizard_Organisation_ChooseCountryEU_render_xml"), 
-                               'render_raw' => array( $this, "Wizard_Organisation_ChooseCountryEU_render_raw"), 
                                "process"    => array( $this, "Wizard_Organisation_ChooseCountryEU_process"))));
 
     $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseCountryNOTEU"=>array(
                                'render_xml'    => array( $this, "Wizard_Organisation_ChooseCountryNOTEU_render_xml"),                                
-                               'render_raw'    => array( $this, "Wizard_Organisation_ChooseCountryNOTEU_render_raw"), 
                                "process"       => array( $this, "Wizard_Organisation_ChooseCountryNOTEU_process"))));
 
     $this->stone->Wizard->registerPage(
       array("Wizard_Organisation_ChooseOrganisationType"=>array(
-                               'render_raw'    => array( $this, "Wizard_Organisation_ChooseOrganisationType_render_raw"),
                                'render_xml'    => array( $this, "Wizard_Organisation_ChooseOrganisationType_render_xml"),  
                                "process"       => array( $this, "Wizard_Organisation_ChooseOrganisationType_process"))));
 
@@ -88,15 +84,7 @@ class Organisation extends Component {
     }
 
   }
-//------------------------------------------------------------------------------
-  function Wizard_Organisation_ChooseCountry_render_raw(){
-    $result  = "<form method=post>";
-    $result .= "<button name=country value=NL>Nederland</button>";
-    $result .= "<button name=region value=EU>EU</button>";
-    $result .= "<button name=region value=NOTEU>Buiten EU</button>";
-    $result .= "</form>";
-    return $result;
-  }
+
 //------------------------------------------------------------------------------
   function Wizard_Organisation_ChooseCountry_render_xml(){
     $form = new Form();
@@ -104,19 +92,6 @@ class Organisation extends Component {
     $form->addElement(new FormButtonElement("region","EU", "EU"));
     $form->addElement(new FormButtonElement("region","Buiten EU", "NOTEU"));
     return $form->GenerateForm(NULL, "Kies land", true);
-  }
-//------------------------------------------------------------------------------
-  function Wizard_Organisation_ChooseCountryEU_render_raw(){
-  //STUB
-    $sth  = $this->stone->pdo->prepare("SELECT alpha2, langNL FROM country where alpha2 IN (SELECT alpha2 from country_vies) ORDER BY langNL"); 
-    $sth->execute();
-
-    $result = "<form method=post><select name=country>";
-    while ($country = $sth->fetch()) {
-      $result .= "<option value=" . $country['alpha2'] . ">".$country['langNL'] . "</option>";
-    }
-    $result .= "</select><input type=submit value=volgende></form>";
-    return $result;
   }
 //------------------------------------------------------------------------------
 function Wizard_Organisation_ChooseCountryEU_render_xml(){
@@ -131,19 +106,6 @@ function Wizard_Organisation_ChooseCountryEU_render_xml(){
     return $form->GenerateForm(NULL, "Kies land", false);
   }
 //------------------------------------------------------------------------------
-  function Wizard_Organisation_ChooseCountryNOTEU_render_raw(){
-  //STUB
-    $sth  = $this->stone->pdo->prepare("SELECT alpha2, langNL FROM country where alpha2 NOT IN (SELECT alpha2 from country_vies) ORDER BY langNL"); 
-    $sth->execute();
-
-    $result = "<form method=post><select name=country>";
-    while ($country = $sth->fetch()) {
-      $result .= "<option value=" . $country['alpha2'] . ">".$country['langNL'] . "</option>";
-    }
-    $result .= "</select><input type=submit value=volgende></form>";
-    return $result;
-  }
-//------------------------------------------------------------------------------
 function Wizard_Organisation_ChooseCountryNOTEU_render_xml(){
     $sth  = $this->stone->pdo->prepare("SELECT alpha2, langNL FROM country where alpha2 NOT IN (SELECT alpha2 from country_vies) ORDER BY langNL"); 
     $sth->execute();
@@ -154,20 +116,6 @@ function Wizard_Organisation_ChooseCountryNOTEU_render_xml(){
       $select->addOption(new FormSelectOptionElement($country['alpha2'], $country['langNL']));
     }
     return $form->GenerateForm(NULL, "Kies land", false);
-  }
-//------------------------------------------------------------------------------
-
-  function Wizard_Organisation_ChooseOrganisationType_render_raw(){
-    $result  = "<form method=post>";
-    $result .= "<button name=organisationType value='in_formation'>In oprichting</button>";
-    $result .= "<button name=organisationType value='association_unregged'>Vereniging (zonder kvk)</button>";
-    $result .= "<button name=organisationType value='association_regged'>Vereniging (met kvk)</button>";
-    $result .= "<button name=organisationType value='foundation'>Stichting</button>";
-    $result .= "<button name=organisationType value='company'>Bedrijf</button>";
-    $result .= "<button name=organisationType value='other'>Overige</button>";
-    $result .= "</form>";
-
-    return $result;
   }
 
 //------------------------------------------------------------------------------

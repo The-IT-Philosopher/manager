@@ -50,7 +50,7 @@ class Person extends Component {
 
 
     $this->stone->Wizard->registerPage(
-      array("person_enter"=>array('render_raw'=> array($this, "person_enter_render_raw"), 
+      array("person_enter"=>array(
                               'render_xml'=> array($this, "person_enter_render_xml"), 
                               "process"   => array($this, "person_enter_process"))));
   }
@@ -62,19 +62,6 @@ class Person extends Component {
     $this->stone->Wizard->render();
   }
 //------------------------------------------------------------------------------
-  function person_enter_render_raw(){
-    $form = "<form method=post>";
-    $form .= "<table>";
-    $form .= "<tr><td>Voornaam</td><td><input type=text name=first_name></td></tr>";
-    $form .= "<tr><td>Voorletters</td><td><input type=text name=initials></td></tr>";
-    $form .= "<tr><td>Tussenvoegsel</td><td><input type=text name=last_name_prefix></td></tr>";
-    $form .= "<tr><td>Achternaam</td><td><input type=text name=last_name></td></tr>";
-    $form .= "<tr><td>E-mail adres</td><td><input type=email name=email_address></td></tr>";
-    $form .= "<tr><td></td><td><input type=submit value=volgense></td></tr>";
-    $form .= "</table></form>";
-    return $form;
-  }
-//------------------------------------------------------------------------------
   function person_enter_render_xml(){
     $form = new Form();
 
@@ -82,7 +69,7 @@ class Person extends Component {
     $form->addElement(new FormInputElement("initials","Voorletters"));
     $form->addElement(new FormInputElement("last_name_prefix","Tussenvoegsel"));
     $form->addElement(new FormInputElement("last_name","Achternaam"));
-    $form->addElement(new FormInputElement("email_address","E-mail adres"));
+    $form->addElement(new FormInputElement("email_address","E-mail adres","email"));
     return $form->GenerateForm(NULL, "Voer persoonsgegevens in");
   }
 

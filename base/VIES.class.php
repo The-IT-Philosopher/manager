@@ -43,21 +43,12 @@ class VIES extends Component {
 //------------------------------------------------------------------------------
   function init() {
     $this->stone->Wizard->registerPage(
-      array("vies_enter"=>array('render_raw'=> array($this, "vies_enter_render_raw"), 
+      array("vies_enter"=>array('render_xml'=> array($this, "vies_enter_render_xml"), 
                                "process"   => array($this, "vies_enter_process"))));
 
     $this->stone->Wizard->registerPage(
       array("vies_ok"=>array('render_raw'=> array($this, "vies_ok_render_raw"), 
                                "process" => array($this, "vies_ok_process"))));
-  }
-//------------------------------------------------------------------------------
-  function vies_enter_render_raw(){
-    $result  = "<form method=post>";
-    $result .= "<table>";
-    $result .= "<tr><td>BTW Nummer</td><td><input type=text name=vat></td></tr>";
-    $result .= "<tr><td></td><td><input type=submit value=volgense></td></tr>";
-    $result .= "</table></form>";
-    return $result;
   }
 //------------------------------------------------------------------------------
   function vies_enter_render_xml(){
