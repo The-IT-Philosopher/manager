@@ -247,7 +247,7 @@ class Project extends Component {
 //------------------------------------------------------------------------------
   function declareWizard_declaretime_process(){
     $result = array();
-    if (@$_POST['date'] && @$_POST['quarters']){ 
+    if (@$_POST['date']){ 
       $sth = $this->stone->pdo->prepare("INSERT INTO project_hours (project_id, project_hours_date,project_hours_hours,project_hours_quarters) VALUES (:project_id, :date,:hours,:quarters)");
       $retval = $sth->execute(array(":project_id" => $this->stone->Wizard->_data['projectId'], 
                           ":date" =>$_POST['date'] ,

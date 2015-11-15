@@ -164,7 +164,7 @@ class Stone {
     $menuItem['slug']  = "projects";
     $this->_data['menu'][]=$menuItem;
 
-  } else $this->_data['content_raw'] .= "ERROR INSUFFICIENT CAPABILITIES<BR>";
+  } else $this->_data['content_raw'] .= "PLEASE LOG IN";
 
 // STUB
 //    if ($this->_request[0]=="organisations") {

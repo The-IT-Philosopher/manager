@@ -39,8 +39,8 @@ html, body {
 }
 
 .container .center, .main .left, .main .right {
-  /* border: 1px solid blue; */
-  border: 1px solid red; 
+   border: 1px solid blue; 
+  /* border: 1px solid red; */
   border-radius: 12px;
   /* Firefox still doesn't support dotted border */
 }
@@ -57,13 +57,13 @@ html, body {
 /* Colour settings */
 
 html {
-  /* background-color: #ddf;  */
-  background-color: #fdd;
+  background-color: #ddf;  
+  /* background-color: #fdd; */
 }
 
 .container .center, .main .left, .main .right {
-  /* background-color: #eef; */
-  background-color: #fee; 
+  background-color: #eef; 
+  /* background-color: #fee; */
   overflow:auto; 
 }
 
@@ -180,8 +180,6 @@ html {
   min-height: 100%;
 }
 
-/* DEBUGGING */
-.right { width:450px;  }
 
 .menu button {
   width : 100%;
