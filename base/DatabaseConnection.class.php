@@ -47,10 +47,15 @@ class DatabaseConnection extends Component{
     //      To allow multiple database connections simultanously. This will
     //      enable us to run comparisons and also assists in database migration.
     //NOTE: Do we also need an option to specify custom? 
-    try {
+    if (defined("DBTYPE")) {
       switch (DBTYPE) {
         case 'MYSQL':
         case 'MARIADB':
+          if (!(defined("DBHOST"))) throw new \Exception("DBHOST not defined");
+          if (!(defined("DBNAME"))) throw new \Exception("DBNAME not defined");
+          if (!(defined("DBUSER"))) throw new \Exception("DBUSER not defined");
+          if (!(defined("DBPASS"))) throw new \Exception("DBPASS not defined");
+
            if (-1==version_compare(phpversion(),"5.3.6")) {
              $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8");
           }            else $options=null;
@@ -60,40 +65,35 @@ class DatabaseConnection extends Component{
           break;
         case 'PGSQL':
         case 'POSTGRES':
+          if (!(defined("DBHOST"))) throw new \Exception("DBHOST not defined");
+          if (!(defined("DBNAME"))) throw new \Exception("DBNAME not defined");
+          if (!(defined("DBUSER"))) throw new \Exception("DBUSER not defined");
+          if (!(defined("DBPASS"))) throw new \Exception("DBPASS not defined");
+
           $pdo = new \PDO('pgsql:host='.DBHOST.
                                 ';dbname='.DBNAME, DBUSER, DBPASS);
           break;
         case 'SQLITE':
         case 'SQLITE3':
+          if (!(defined("DBNAME"))) throw new \Exception("DBNAME not defined");
           $pdo = new \PDO('sqlite:'.DBNAME);
           break;
         case 'FIREBIRD':
         case 'INTERBASE':
+          if (!(defined("DBNAME"))) throw new \Exception("DBNAME not defined");
+          if (!(defined("DBUSER"))) throw new \Exception("DBUSER not defined");
+          if (!(defined("DBPASS"))) throw new \Exception("DBPASS not defined");
+          //can firebird run on a different server as well? how to specify?
           $pdo = new \PDO('firebird:dbname='.DBNAME, DBUSER, DBPASS);
 
         default:
-          throw new \Exception("Unknown Database Type specified");
+          throw new \Exception("Unknown DBTYPE defined");
       }
-    } catch (\Exception $e) {
-      $this->_errors[]=$e;
+      return $pdo; 
+    } else {
+      throw new \Exception("DBTYPE not defined");
     }
-
-
-
-    /*
-      Note: For security reasons we unset the database defines after connecting
-    */
-    if (function_exists("uopz_undefine")) {
-      uopz_undefine(DBTYPE);
-      uopz_undefine(DBNAME);
-      uopz_undefine(DBUSER);
-      uopz_undefine(DBPASS);
-      uopz_undefine(DBHOST);
-      //uopz_undefine(DBPORT);    //TODO: PORT SUPPORT?
-    } // check for existance of funtion.... php module!!! 
-      // also we need to check what otehr php module dependencies we have
-      //
-    return $pdo; 
+    
   }
     
 //------------------------------------------------------------------------------

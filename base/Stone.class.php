@@ -35,7 +35,7 @@ namespace Philosopher;
 
 class Stone {
   private $_components = array();
-  private $_data       = array("content_raw"=>"");
+  private $_data       = array("content_raw"=>"", "content_xml"=>array() );
 
   // might not be needed anymore with current magic
   private $_wizard;
@@ -183,6 +183,7 @@ class Stone {
     $this->_renders[0]->render($this->_data);
     $this->_data['content_right_raw'] = ""; // prevent reflection of previous right_raw
     $this->_data['content_raw'] = "";
+    $this->_data['content_xml'] = array();
   }
 
 

@@ -43,17 +43,17 @@ class Customer extends Component {
 
     $this->stone->Wizard->registerPage(
       array("Customer_add_existing"=>array(
-                               'render_raw'    => array( $this, "add_existing_render_raw"), 
+                               'render_xml'    => array( $this, "add_existing_render_xml"), 
                                "process"       => array( $this, "add_existing_process"))));
 
     $this->stone->Wizard->registerPage(
       array("Customer_add_existing_organisation"=>array(
-                               'render_raw'    => array( $this, "add_existing_organisation_render_raw"), 
+                               'render_xml'    => array( $this, "add_existing_organisation_render_xml"), 
                                "process"       => array( $this, "add_existing_process"))));
 
     $this->stone->Wizard->registerPage(
       array("Customer_add_existing_person"=>array(
-                               'render_raw'    => array( $this, "add_existing_person_render_raw"), 
+                               'render_xml'    => array( $this, "add_existing_person_render_xml"),   
                                "process"       => array( $this, "add_existing_process"))));
 
   }
@@ -157,14 +157,6 @@ class Customer extends Component {
     $this->stone->_data['content_raw'] .= "</table>";
   }
 //------------------------------------------------------------------------------
-  function add_existing_render_raw() {
-    //STUB
-    //$this->stone->_data['content_raw'] .= "<h2>Organisations</h2>";
-    $this->add_existing_organisation_render_raw();
-    //$this->stone->_data['content_raw'] .= "<h2>Persons</h2>";
-    $this->add_existing_person_render_raw();
-  }
-//------------------------------------------------------------------------------
   function add_existing_process() {
     $result = array();
     if (isset($_POST['organisation_id'])) {
@@ -189,9 +181,9 @@ class Customer extends Component {
 
     return $result;
   }
+
 //------------------------------------------------------------------------------
-  function add_existing_organisation_render_raw() {
-    $this->stone->_data['content_raw'] .= "<h2>Organisations</h2>";
+  function add_existing_organisation_render_xml() {
     $sth = $this->stone->pdo->prepare("SELECT organisation_id, organisation_name
                                        FROM organisation
                                        WHERE organisation_id NOT IN 
@@ -200,18 +192,18 @@ class Customer extends Component {
                                            )");
 
     $sth->execute();
-    $this->stone->_data['content_raw'] .= "<form method=post><table>";
-    while ($customer = $sth->fetch()){
+    $form = new Form(); 
 
-      $this->stone->_data['content_raw'] .= "<tr><td>".$customer['organisation_name']."</td>";
-      $this->stone->_data['content_raw'] .= "<td><button name=organisation_id value=".$customer['organisation_id'].">Toevoegen</button></td></tr>";
+    // TODO: create form support for the original structure
+    while ($customer = $sth->fetch()){
+      $form->addElement(new FormButtonElement("organisation_id",$customer['organisation_name'], $customer['organisation_id']));      
     }
-    $this->stone->_data['content_raw'] .= "</table></form>";
+    return $form->GenerateForm(NULL, "Kies de organisatie om toe te voegen als klant", false);
 
   }
+
 //------------------------------------------------------------------------------
-  function add_existing_person_render_raw() {
-    $this->stone->_data['content_raw'] .= "<h2>Persons</h2>";
+  function add_existing_person_render_xml() {
     //TODO: also check if a person is not linked to an organisation?
     //A person might be both individual and coorperate customer
     $sth = $this->stone->pdo->prepare("SELECT person_id ,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name) as person_name
@@ -220,16 +212,18 @@ class Customer extends Component {
                                            ( SELECT organisation_id 
                                              FROM link_customer2person
                                            )");
-
     $sth->execute();
-    $this->stone->_data['content_raw'] .= "<form method=post><table>";
+    $form = new Form(); 
+
+    // TODO: create form support for the original structure
     while ($customer = $sth->fetch()){
-      $this->stone->_data['content_raw'] .= "<tr><td>".$customer['person_name']."</td></tr>";
-      $this->stone->_data['content_raw'] .= "<td><button name=organisation_id value=".$customer['person_id'].">Toevoegen</button></td></tr>";
+      $form->addElement(new FormButtonElement("person_id",$customer['person_name'], $customer['person_id']));      
     }
-    $this->stone->_data['content_raw'] .= "</table></form>";
+    return $form->GenerateForm(NULL, "Kies de persoon om toe te voegen als klant", false);
 
   }
+
+//------------------------------------------------------------------------------
 
 
 

@@ -44,7 +44,12 @@ class Wizard extends Component {
   public function render() {
     // STUB
     if (!isset($this->_current_page)) $this->_current_page=$this->_init_page;
-    if (isset($this->_current_page['render_raw'])) {
+    if (isset($this->_current_page['render_xml'])) {
+      $form = call_user_func($this->_current_page['render_xml']);
+      $this->stone->_data['content_xml'][] = $form;
+    } else if (isset($this->_current_page['render_raw'])) { 
+      // fallback to RAW content
+      // Might not be supported in the future
       $form = call_user_func($this->_current_page['render_raw']);
       $this->stone->_data['content_raw'] .= $form;
     } else {

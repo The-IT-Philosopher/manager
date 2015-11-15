@@ -50,27 +50,30 @@ class Person extends Component {
 
 
     $this->stone->Wizard->registerPage(
-      array("person_enter"=>array('render_raw'=> array($this, "person_enter_render_raw"), 
-                               "process"   => array($this, "person_enter_process"))));
+      array("person_enter"=>array(
+                              'render_xml'=> array($this, "person_enter_render_xml"), 
+                              "process"   => array($this, "person_enter_process"))));
   }
-
+//------------------------------------------------------------------------------
   function ProcessPage() {
-    $this->stone->_data['content_raw'] .= "TODO PersonPage";
+    // STUB / TESTING PERSON WIZARD
+    $this->stone->Wizard->initPage("person_enter");
+    $this->stone->Wizard->process();    
+    $this->stone->Wizard->render();
+  }
+//------------------------------------------------------------------------------
+  function person_enter_render_xml(){
+    $form = new Form();
+
+    $form->addElement(new FormInputElement("first_name","Voornaam"));
+    $form->addElement(new FormInputElement("initials","Voorletters"));
+    $form->addElement(new FormInputElement("last_name_prefix","Tussenvoegsel"));
+    $form->addElement(new FormInputElement("last_name","Achternaam"));
+    $form->addElement(new FormInputElement("email_address","E-mail adres","email"));
+    return $form->GenerateForm(NULL, "Voer persoonsgegevens in");
   }
 
-  function person_enter_render_raw(){
-    $form = "<form method=post>";
-    $form .= "<table>";
-    $form .= "<tr><td>Voornaam</td><td><input type=text name=first_name></td></tr>";
-    $form .= "<tr><td>Voorletters</td><td><input type=text name=initials></td></tr>";
-    $form .= "<tr><td>Tussenvoegsel</td><td><input type=text name=last_name_prefix></td></tr>";
-    $form .= "<tr><td>Achternaam</td><td><input type=text name=last_name></td></tr>";
-    $form .= "<tr><td>E-mail adres</td><td><input type=email name=email_address></td></tr>";
-    $form .= "<tr><td></td><td><input type=submit value=volgense></td></tr>";
-    $form .= "</table></form>";
-    return $form;
-  }
-
+//------------------------------------------------------------------------------
   function person_enter_process(){
     $result = array();
     if ( (strlen($_POST['first_name']) || strlen($_POST['initials'])) && strlen($_POST['last_name'])) {

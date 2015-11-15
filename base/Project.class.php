@@ -45,7 +45,7 @@ class Project extends Component {
 
     $this->stone->Wizard->registerPage(
       array("declareWizard_chooseproject"=>array(
-                               'render_raw'    => array( $this, "declareWizard_chooseproject_render_raw"), 
+                               'render_xml'    => array( $this, "declareWizard_chooseproject_render_xml"), 
                                "process"       => array( $this, "declareWizard_chooseproject_process"))));
 
     $this->stone->Wizard->registerPage(
@@ -53,22 +53,16 @@ class Project extends Component {
                                'render_raw'    => array( $this, "declareWizard_declaretime_render_raw"), 
                                "process"       => array( $this, "declareWizard_declaretime_process"))));
 
-  $this->stone->Wizard->registerPage(
-      array("declareWizard_declaretime"=>array(
-                               'render_raw'    => array( $this, "declareWizard_declaretime_render_raw"), 
-                               "process"       => array( $this, "declareWizard_declaretime_process"))));
 
-
-  $this->stone->Wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("addProject_choosecustomer"=>array(
-                               'render_raw'    => array( $this, "addProject_choosecustomer_render_raw"), 
+                               'render_xml'    => array( $this, "addProject_choosecustomer_render_xml"), 
                                "process"       => array( $this, "addProject_choosecustomer_process"))));
 
-  $this->stone->Wizard->registerPage(
+    $this->stone->Wizard->registerPage(
       array("addProject_projectInfo"=>array(
-                               'render_raw'    => array( $this, "addProject_projectInfo_render_raw"), 
+                               'render_xml'    => array( $this, "addProject_projectInfo_render_xml"), 
                                "process"       => array( $this, "addProject_projectInfo_process"))));
-
 
   }
 //------------------------------------------------------------------------------
@@ -105,7 +99,7 @@ class Project extends Component {
     
   }
 //------------------------------------------------------------------------------
-  function addProject_choosecustomer_render_raw(){
+  function addProject_choosecustomer_render_xml(){
     $sth = $this->stone->pdo->prepare("SELECT customer_id, customer_name
                           FROM (SELECT customer_id,organisation_name as customer_name
                                 FROM   link_customer2organisation
@@ -116,17 +110,18 @@ class Project extends Component {
                                 JOIN    person
                                 ON link_customer2person.person_id = person.person_id ) ");
     $sth->execute();
-    $form = "<form method=post>";
-    $form .= "<table><tr><td></td><td><input type=submit name=internal value='Intern project'></td></tr>";
-    $form .= "<tr><td>Kies klant</td><td>";
-    $form .= "<select size=5 name=customer_id>";
+    $form = new Form();
+    $form->addElement(new FormButtonElement("internal",'0000 - Intern project'));
+
+
     while ($customer = $sth->fetch()){
-      $form .= "<OPTION VALUE=". $customer['customer_id'] . ">". sprintf("%04d ",$customer['customer_id']) . $customer['customer_name'] . "</option>";
+      // in the render_raw we had a select with height 5
+      // we need a better customer seleting system, searchable, etc. later anyways.
+      // but for now thsi will suffice
+      $form->addElement(new FormButtonElement("customer_id",sprintf("%04d - %s",$customer['customer_id'], $customer['customer_name']), $customer['customer_id']));
     }
-    $form .="</select></td></tr>";
-    $form .="<tr><td></td><td><input type=submit value=volgende></td></tr></table>";
-    $form .= "</form>";     
-    return $form;
+
+    return $form->GenerateForm(NULL, "Kies een klant", false);
   }
 //------------------------------------------------------------------------------
   function addProject_choosecustomer_process() {
@@ -140,30 +135,36 @@ class Project extends Component {
   return $result;
   }
 //------------------------------------------------------------------------------
-  function addProject_projectInfo_render_raw(){
-    $form = "<form method=post>";
-    $form .= "<table>";
-    $form .= "<tr><td>Projectnaam</td><td><input type=text name=description_short></td></tr>";
-    $form .= "<tr><td>Omschrijving</td><td><textarea name=description_long cols=65 rows=5></textarea></td></tr>";
+  function addProject_projectInfo_render_xml(){
+
+    $form = new Form();
+    $form->addElement(new FormInputElement("description_short", "Projectnaam"));
+    $form->addElement(new FormInputElement("description_long", "Omschrijving", "textarea"));
+
+    //$form .= "<tr><td>Projectnaam</td><td><input type=text name=description_short></td></tr>";
+    //$form .= "<tr><td>Omschrijving</td><td><textarea name=description_long cols=65 rows=5></textarea></td></tr>";
+
 
     if (isset($this->stone->Wizard->_data['customerId'])) {
       //$form .= "project voor klant";
-      $form .= "<tr><td>Kostenberekening</td><td><select name=billing_type>";
-      $form .= "<option value=timed>Uurtarief</option>";
-      $form .= "<option value=fixed>Vast bedrag</option>";
-      $form .= "</select></td></tr>";
-      $form .= "<tr><td>Bedrag (centen)</td><td><input type=number name=billing_rate></td></tr>";
+      $select = new FormInputElement("billing_type", "Kostenberekening", "select");
+      $form->addElement($select);
+      $select->addOption(new FormSelectOptionElement("timed", "Uurtarief"));
+      $select->addOption(new FormSelectOptionElement("fixed", "Vast bedrag"));
+      $form->addElement(new FormInputElement("billing_rate","Bedrag (in centen)", "number"));
     } else {
-      //$form .= "intern project";
+
     }
-    $form .= "<tr><td>Status</td><td><select name=status>";
-    $form .= "<option value=planned>Gepland</option>";
-    $form .= "<option value=running>Lopende</option>";
-    $form .= "<option value=finished>Afgerond</option>";
-    $form .= "</select></td></tr>";
-    $form .="<tr><td></td><td><input type=submit value=volgende></td></tr>";
-    $form .= "</table></form>";
-    return $form;
+
+    $select = new FormInputElement("status", "Status", "select");
+    $form->addElement($select);
+    $select->addOption(new FormSelectOptionElement("negotiation", "Voorbesprekingen"));
+    $select->addOption(new FormSelectOptionElement("planned", "Gepland"));
+    $select->addOption(new FormSelectOptionElement("running", "Lopend"));
+    $select->addOption(new FormSelectOptionElement("finished", "Afgerond"));
+    $select->addOption(new FormSelectOptionElement("cancelled", "Afgelast"));
+
+    return $form->GenerateForm(NULL, "Voer projectgegevens in");
   }
 //------------------------------------------------------------------------------
   function addProject_projectInfo_process(){
@@ -213,15 +214,14 @@ class Project extends Component {
     return $result;  
   }
 //------------------------------------------------------------------------------
-  function declareWizard_chooseproject_render_raw(){
+  function declareWizard_chooseproject_render_xml(){
     $sth = $this->stone->pdo->prepare("SELECT project_id, project_description_short FROM project ");
     $sth->execute();
-    $form = "<form method=post><table>";
+    $form = new Form();
     while ($project = $sth->fetch()){
-      $form.="<tr><td>" . $project['project_id'] . "</td><td>" . $project['project_description_short'] . "</td><td><button name=declareProject value=".$project['project_id'].">Declareren</button></td></tr>";
+      $form->addElement(new FormButtonElement("project_id",$project['project_description_short'], $project['project_id']));
     }
-    $form.="</table></form>";
-    return $form;
+  return $form->GenerateForm(NULL, "Kies project");
   }
 //------------------------------------------------------------------------------
   function declareWizard_chooseproject_process(){
@@ -234,11 +234,11 @@ class Project extends Component {
   }
 //------------------------------------------------------------------------------
   function declareWizard_declaretime_render_raw(){
+    // current form implementation cannot have parameters such as min and max yet
+    // this will be postponed till the next iteration of the rendering engine 
     $form = "<form method=post><table>";
     $form .= "<tr><td>Uren</td><td><input type=number name=hours min=0 max=12></td></tr>";
     $form .= "<tr><td>Kwartier</td><td><input type=number name=quarters min=0 max=3></td></tr>";
-    // make it default to 'today'
-    // note: Firefox doesn't yet support 'date', Chromium does
     $form .= "<tr><td>Datum</td><td><input type=date name=date value=".date('Y-m-d') ."></td></tr>";
     $form .= "<tr><td></td><td><input name=declare type=submit value=Declareren></td></tr>";
     $form.="</table></form>";
