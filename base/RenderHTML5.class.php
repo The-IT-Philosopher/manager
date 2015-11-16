@@ -54,6 +54,7 @@ class RenderHTML5 extends Component implements Render {
 
     $output = str_replace("{main_right}",$data['content_right_raw'],$output);
 
+    $output = str_replace("{copyright}",$data['copyright'],$output);
  
     $menu = "<div class='menu'>";
     foreach ($data['menu'] as $menuItem) {
