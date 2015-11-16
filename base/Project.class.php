@@ -254,6 +254,30 @@ class Project extends Component {
     // next to show, who is the project owner, billing rate, project state
     // then perhaps something like below, hours per month or so
 
+
+    $sth = $this->stone->pdo->prepare("SELECT  all_customers.customer_id, customer_name  FROM 
+                                       (SELECT * FROM 
+                                         (SELECT customer_id,organisation_name as customer_name
+                                          FROM   link_customer2organisation
+                                          JOIN   organisation 
+                                          ON link_customer2organisation.organisation_id = organisation.organisation_id) as ALIAS_A
+                                        UNION (SELECT customer_id,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name)  as customer_name
+                                          FROM   link_customer2person
+                                          JOIN    person
+                                            ON link_customer2person.person_id = person.person_id ) 
+                                        ) as all_customers 
+                                       JOIN link_customer2project 
+                                         ON link_customer2project.customer_id = all_customers.customer_id 
+                                       JOIN project on project.project_id = link_customer2project.project_id
+                                       WHERE project.project_id = :projectId");
+// Damn it becomes a huge ugly query... it seems the (SELECT * FROM...) is required to give the result of the UNION an alias  
+
+    $sth->execute(array(":projectId"=>$this->stone->Wizard->_data['projectId']));
+    $projectCustomer = $sth->fetch();
+    if ($projectCustomer) {
+      $result .= "<h1>Klantinformatie</h1>";
+      $result .= "<h2>".$projectCustomer['customer_name']."</h2>";
+    }  
 /*
   this is a nice query for somewhere else, show hours per project per month, make a place for that
     $sth = $this->stone->pdo->prepare("SELECT project_id,  project_description_short
