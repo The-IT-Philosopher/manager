@@ -76,7 +76,7 @@ class Person extends Component {
 //------------------------------------------------------------------------------
   function person_enter_process(){
     $result = array();
-    if ( (strlen($_POST['first_name']) || strlen($_POST['initials'])) && strlen($_POST['last_name'])) {
+    if ( (strlen(@$_POST['first_name']) || strlen(@$_POST['initials'])) && strlen(@$_POST['last_name'])) {
       $insertData = array();
       $insertData[':person_first_name'] = $_POST['first_name'];
       $insertData[':person_initials']   = $_POST['initials'];

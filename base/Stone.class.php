@@ -178,7 +178,7 @@ class Stone {
 // STUB
     $this->Page->render();
 
-    //$this->_data['content_right_raw'] = "<PRE>" . htmlentities(@var_export($_SESSION,true)) . "></PRE>";
+    $this->_data['content_right_raw'] = "<PRE>" . htmlentities(@var_export($_SESSION,true)) . "></PRE>";
    
     $this->_renders[0]->render($this->_data);
     $this->_data['copyright'] = "Copyright &copy; 2015 The IT Philosopher";
