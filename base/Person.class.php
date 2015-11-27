@@ -35,7 +35,7 @@ namespace Philosopher;
 
 class Person extends Component {
 
-  private $_donePage = "done";
+  private $_donePage = "address_enter";  // set the default next page to the address enter form
   
   function setDonePage($donepage) {
       $this->_donePage=$donepage;
@@ -86,6 +86,7 @@ class Person extends Component {
       $sth->execute($insertData);
       $person_id = $this->stone->pdo->lastInsertId();
       $this->stone->Wizard->_data['personId'] = $person_id;
+     
       if (strlen($_POST['email_address'])) {
         $insertData = array();
         $insertData[":email_verification"]=sha1(mcrypt_create_iv(16), MCRYPT_DEV_URANDOM ); 
