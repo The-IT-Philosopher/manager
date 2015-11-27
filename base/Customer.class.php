@@ -70,14 +70,14 @@ class Customer extends Component {
 
     if ($this->stone->_request[1]=="addnewperson") {
       $this->stone->Wizard->initPage("person_enter");
-      $this->stone->Person->setDonePage("Customer_add_existing_person"); //??
+      $this->stone->Person->setDonePage("Customer_add_existing_person"); //?? handover
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
     }
 
     if ($this->stone->_request[1]=="addneworganisation") {
       $this->stone->Wizard->initPage("Wizard_Organisation_ChooseCountry");
-      $this->stone->Organisation->setDonePage("Customer_add_existing_organisation"); //??
+      $this->stone->Organisation->setDonePage("Customer_add_existing_organisation"); //?? //handover
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
     }
