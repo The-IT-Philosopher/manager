@@ -54,7 +54,7 @@ class KvK extends Component {
   function kvk_enter_render_xml(){
     $form = new Form();
     $form->addElement(new FormInputElement("kvk","KvK Nummer", "number"));
-    return $form->GenerateForm(NULL, "Voer KvK nummer in", true);
+    return $form->GenerateForm(NULL, "Voer KvK nummer in");
   }
 //------------------------------------------------------------------------------
   function kvk_enter_process() {
@@ -90,10 +90,10 @@ class KvK extends Component {
       $sth->execute($insertData);
       $address_id = $this->stone->pdo->lastInsertId(); 
       $this->stone->Wizard->_data['addressId'] = $address_id; 
+
+
       $sth = $this->stone->pdo->prepare("INSERT INTO organisation (organisation_name, organisation_type, organisation_nl_kvk, organisation_country)
                             VALUES (:organisation_name, :organisation_type, :organisation_nl_kvk, 'NL')");
-
-
       $insertData = array();
       $insertData[':organisation_name'] = $kvkData['organisation_name'];
       $insertData[':organisation_type'] = $this->stone->Wizard->_data['organisationType'];
@@ -101,6 +101,8 @@ class KvK extends Component {
       $sth->execute($insertData);
       $organisation_id = $this->stone->pdo->lastInsertId();
       $this->stone->Wizard->_data['organisationId'] = $organisation_id;
+
+
       $sth = $this->stone->pdo->prepare ("INSERT INTO link_address2organisation (address_id, organisation_id, address_type) VALUES
                              (:address_id, :organisation_id, 'validated' )");
       $sth->execute(array(":address_id"=>$address_id, ":organisation_id" => $organisation_id));

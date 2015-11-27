@@ -70,7 +70,9 @@ class Customer extends Component {
 
     if ($this->stone->_request[1]=="addnewperson") {
       $this->stone->Wizard->initPage("person_enter");
-      $this->stone->Person->setDonePage("Customer_add_existing_person"); //?? handover
+      //$this->stone->Person->setDonePage("Customer_add_existing_person"); //?? handover
+      $this->stone->Person->setDonePage("address_enter"); //?? handover
+      $this->stone->Address->setDonePage("Customer_add_existing_person"); //?? handover
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
     }
@@ -84,7 +86,7 @@ class Customer extends Component {
 
     if ($this->stone->_request[1]=="addexistingperson") {
       $this->stone->Wizard->initPage("Customer_add_existing_person");
-      $this->stone->Organisation->setDonePage("done");
+      $this->stone->Person->setDonePage("done");
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
     }

@@ -63,6 +63,7 @@ try {
     $stone->registerComponent(new Page());
 //    $stone->registerComponent(new Form()); // Form is not to be a component class ...
 
+    $stone->registerComponent(new Address());
     $stone->registerComponent(new KvK());
     $stone->registerComponent(new VIES());
     $stone->registerComponent(new Organisation());
