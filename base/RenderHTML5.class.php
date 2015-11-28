@@ -38,6 +38,8 @@ class RenderHTML5 extends Component implements Render {
   
   //stub
   function render($data) {
+
+    if (defined("dev"))     $output = file_get_contents(__DIR__."/template/index-dev.tpl"); else
     $output = file_get_contents(__DIR__."/template/index.tpl");
 
     $template_url = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__."/template/");
@@ -54,6 +56,7 @@ class RenderHTML5 extends Component implements Render {
 
     $output = str_replace("{main_right}",$data['content_right_raw'],$output);
 
+    $output = str_replace("{copyright}",$data['copyright'],$output);
  
     $menu = "<div class='menu'>";
     foreach ($data['menu'] as $menuItem) {

@@ -44,9 +44,20 @@ class Project extends Component {
       )));
 
     $this->stone->Wizard->registerPage(
-      array("declareWizard_chooseproject"=>array(
-                               'render_xml'    => array( $this, "declareWizard_chooseproject_render_xml"), 
-                               "process"       => array( $this, "declareWizard_chooseproject_process"))));
+      array("chooseproject_decl"=>array(
+                               'render_xml'    => array( $this, "chooseproject_render_xml"), 
+                               "process"       => array( $this, "chooseproject_decl_process"))));
+
+    $this->stone->Wizard->registerPage(
+      array("chooseproject_view"=>array(
+                               'render_xml'    => array( $this, "chooseproject_render_xml"), 
+                               "process"       => array( $this, "chooseproject_view_process"))));
+
+  $this->stone->Wizard->registerPage(
+      array("showProjectDetails"=>array(
+                               'render_raw'    => array( $this, "showProjectDetails_render_raw"), 
+                               "process"       => array( $this, "showProjectDetails_process"))));
+
 
     $this->stone->Wizard->registerPage(
       array("declareWizard_declaretime"=>array(
@@ -78,6 +89,8 @@ class Project extends Component {
     $this->stone->_data['content_raw'] .= "<a href=declare><button>Uren declareren</button></a>";
     $this->stone->_data['content_raw'] .= "<a href=view><button>Projecten tonen</button></a>";
 
+
+    // TODO I suppose we should register subpages and add a WizardPage
     switch ($this->stone->_request[1]) {
       case "add":
         $this->stone->Wizard->initPage("addProject_choosecustomer");
@@ -85,12 +98,15 @@ class Project extends Component {
         $this->stone->Wizard->render();          
         break;
       case "declare":    
-        $this->stone->Wizard->initPage("declareWizard_chooseproject");
+        $this->stone->Wizard->initPage("chooseproject_decl");
         $this->stone->Wizard->process();    
         $this->stone->Wizard->render();          
         break;
       case "view":
-        $this->view();
+        //$this->view();
+        $this->stone->Wizard->initPage("chooseproject_view");
+        $this->stone->Wizard->process();    
+        $this->stone->Wizard->render();          
         break;
     }
     //if ($request[1]=="add") Project::addWizard();
@@ -214,7 +230,7 @@ class Project extends Component {
     return $result;  
   }
 //------------------------------------------------------------------------------
-  function declareWizard_chooseproject_render_xml(){
+  function chooseproject_render_xml(){
     $sth = $this->stone->pdo->prepare("SELECT project_id, project_description_short FROM project ");
     $sth->execute();
     $form = new Form();
@@ -224,10 +240,86 @@ class Project extends Component {
   return $form->GenerateForm(NULL, "Kies project");
   }
 //------------------------------------------------------------------------------
-  function declareWizard_chooseproject_process(){
+  function showProjectDetails_render_raw(){
+    $result = "<p>RenderRawDetails<br>We need a new rederer soon</p>";
+    $currentMonth = date("n");
+
+    $sth = $this->stone->pdo->prepare("SELECT * FROM project WHERE  project_id = :projectId");
+    $sth->execute(array(":projectId"=>$this->stone->Wizard->_data['projectId']));
+    $projectInfo = $sth->fetch();
+    $result .= "<h1>Projectinformatie</h1>";
+    $result .= "<h2>".$projectInfo['project_description_short']."</h2>";
+    $result .= "<div>".$projectInfo['project_description_long']."</div>";
+
+    // next to show, who is the project owner, billing rate, project state
+    // then perhaps something like below, hours per month or so
+
+
+    $sth = $this->stone->pdo->prepare("SELECT  all_customers.customer_id, customer_name  FROM 
+                                       (SELECT * FROM 
+                                         (SELECT customer_id,organisation_name as customer_name
+                                          FROM   link_customer2organisation
+                                          JOIN   organisation 
+                                          ON link_customer2organisation.organisation_id = organisation.organisation_id) as ALIAS_A
+                                        UNION (SELECT customer_id,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name)  as customer_name
+                                          FROM   link_customer2person
+                                          JOIN    person
+                                            ON link_customer2person.person_id = person.person_id ) 
+                                        ) as all_customers 
+                                       JOIN link_customer2project 
+                                         ON link_customer2project.customer_id = all_customers.customer_id 
+                                       JOIN project on project.project_id = link_customer2project.project_id
+                                       WHERE project.project_id = :projectId");
+// Damn it becomes a huge ugly query... it seems the (SELECT * FROM...) is required to give the result of the UNION an alias  
+
+    $sth->execute(array(":projectId"=>$this->stone->Wizard->_data['projectId']));
+    $projectCustomer = $sth->fetch();
+    if ($projectCustomer) {
+      $result .= "<h1>Klantinformatie</h1>";
+      $result .= "<h2>".$projectCustomer['customer_name']."</h2>";
+    }  
+
+
+    // begin hours for current month
+    $sth = $this->stone->pdo->prepare("SELECT project_hours_date, project_hours_hours, project_hours_quarters
+                                       FROM project_hours  
+                                       WHERE MONTH(project_hours_date) = :currentMonth 
+                                             AND project_hours.project_id = :projectId");
+    $sth->execute(array(":currentMonth"=>$currentMonth, ":projectId"=>$this->stone->Wizard->_data['projectId']));
+    $result .= "<h3>Uren in de huidige maand</h3><table><tr><th>Datum</th><th>Uur</th><th>Kwartier</th></tr>";
+    while ($project_hour = $sth->fetch()) {
+      $result .= "<tr><td>" . date("l d-m-Y", strtotime($project_hour['project_hours_date'])) . "</td><td>".
+                 $project_hour['project_hours_hours'] . "</td><td>".
+                 $project_hour['project_hours_quarters'] . "</td></tr>";
+    }
+    $result .= "</table>";
+    // end hours for current month
+
+/*
+  this is a nice query for somewhere else, show hours per project per month, make a place for that
+    $sth = $this->stone->pdo->prepare("SELECT project_id,  project_description_short
+      SUM(project_hours_hours) + 0.25 * SUM(project_hours_quarters) AS project_hours_total 
+                                       FROM project_hours 
+                                       JOIN project on project.project_id = project_hours.project_id 
+                                       WHERE MONTH(project_hours_date) = :currentMonth GROUP BY project_id");
+    $sth->execute(array(":currentMonth"=>$currentMonth));
+*/
+    return $result;
+  }
+//------------------------------------------------------------------------------
+  function chooseproject_decl_process(){
     $result = array();
     if (isset($_POST['project_id'])){
       $result['next_page']="declareWizard_declaretime";
+      $this->stone->Wizard->_data['projectId'] = $_POST['project_id'];
+    } 
+    return $result;
+  }
+//------------------------------------------------------------------------------
+  function chooseproject_view_process(){
+    $result = array();
+    if (isset($_POST['project_id'])){
+      $result['next_page']="showProjectDetails";
       $this->stone->Wizard->_data['projectId'] = $_POST['project_id'];
     } 
     return $result;

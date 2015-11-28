@@ -1,0 +1,10 @@
+/* Colour settings */
+
+html {
+  background-color: #fdd; 
+}
+
+.container .center, .main .left, .main .right {
+  background-color: #fee; 
+  overflow:auto; 
+}

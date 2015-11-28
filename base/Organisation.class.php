@@ -66,8 +66,58 @@ class Organisation extends Component {
                                'render_xml'    => array( $this, "Wizard_Organisation_ChooseOrganisationType_render_xml"),  
                                "process"       => array( $this, "Wizard_Organisation_ChooseOrganisationType_process"))));
 
+
+
+    $this->stone->Wizard->registerPage(
+      array("Wizard_Organisation_OrganisationName"=>array(
+                               'render_xml'    => array( $this, "organisation_name_render_xml"),  
+                               "process"       => array( $this, "organisation_name_process"))));
+
   }
 //------------------------------------------------------------------------------
+  function organisation_name_render_xml(){
+    $form = new Form();
+    $form->addElement(new FormInputElement("organisation_name","Naam organisatie"));
+    $data = NULL;
+    if (isset($this->stone->Wizard->_data['viesData'])){
+      if (strlen($this->stone->Wizard->_data['viesData']['organisation_name'])) {
+        $data['organisation_name'] = $this->stone->Wizard->_data['viesData']['organisation_name'];
+      }
+    }
+    return $form->GenerateForm($data, "Voer naam organisatie in");
+  }
+//------------------------------------------------------------------------------
+  function organisation_name_process(){
+    $result = array();
+    if (strlen(@$_POST['organisation_name'])) {
+
+      $sth = $this->stone->pdo->prepare("INSERT INTO organisation (organisation_name, organisation_type , organisation_country)
+                            VALUES (:organisation_name, :organisation_type, :organisation_country)");
+
+      $insertData = array();
+      $insertData[':organisation_name'] = $_POST['organisation_name'];
+      $insertData[':organisation_type'] = $this->stone->Wizard->_data['organisationType'];
+      $insertData[':organisation_country'] = $this->stone->Wizard->_data['organisationCountry'];
+      $sth->execute($insertData);
+      $organisation_id = $this->stone->pdo->lastInsertId();
+      $this->stone->Wizard->_data['organisationId'] = $organisation_id;
+      $result['next_page'] = "address_enter";
+
+
+      if (isset($this->stone->Wizard->_data['viesData'])) {
+        $vat_number = $this->stone->Wizard->_data['viesData']['vat_number'];
+        $sth = $this->stone->pdo->prepare("UPDATE organisation 
+                        SET    organisation_vat = :organisation_vat 
+                        WHERE  organisation_id  = :organisation_id");
+        $sth->execute(array(":organisation_vat" => $vat_number, "organisation_id" => $this->stone->Wizard->_data['organisationId']  ));
+      }
+
+
+    }
+    return $result;
+  }
+//------------------------------------------------------------------------------
+
   function Wizard_Organisation_ProcessPage() {
     // we need propper rendering later .... 
     $this->stone->_data['content_raw'] .= "<A href='add'><button>Toevoegen</button></a><a href='show'><button>Tonen</button></a><br>";
@@ -171,7 +221,7 @@ function Wizard_Organisation_ChooseCountryNOTEU_render_xml(){
   function Wizard_Organisation_ChooseOrganisationType_process(){
     $result = array();    
     if (isset($_POST['organisationType'])) {
-      $result['next_page'] = $this->_donePage;
+      $result['next_page'] ="Wizard_Organisation_OrganisationName";
       $this->stone->Wizard->_data['organisationType'] = $_POST['organisationType'];
       if ($this->stone->Wizard->_data['organisationCountry']=="NL") {
         if (! in_array( $this->stone->Wizard->_data['organisationType'], array('in_formation','association_unregged') )) {
@@ -191,13 +241,13 @@ function Wizard_Organisation_ChooseCountryNOTEU_render_xml(){
           if ($Wizard_VIES) {
             // TODO : first enter name/address
             //        then invoke VIES
-            $Wizard_VIES->setDonePage($this->_donePage);
+            $Wizard_VIES->setDonePage("Wizard_Organisation_OrganisationName");
             $result['next_page'] = "vies_enter"; 
           } else {
             //$result['error'] = "VIES Wizard not available"; 
           }
         }
-      }
+      } 
     }
     return $result;
   }

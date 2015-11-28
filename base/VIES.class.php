@@ -54,12 +54,12 @@ class VIES extends Component {
   function vies_enter_render_xml(){
     $form = new Form();
     $form->addElement(new FormInputElement("vat","BTW Nummer"));
-    return $form->GenerateForm(NULL, "Voer BTW nummer in", true);
+    return $form->GenerateForm(NULL, "Voer BTW nummer in");
   }
 //------------------------------------------------------------------------------
   function vies_ok_render_raw(){
     $result  = "<PRE>DATA FROM VIES\n";
-    $result .= var_export($this->stone->Wizard->_data['viesData'],true);
+    $result .= var_export($this->stone->Wizard->_data['viesData'], true);
     $result .= "</PRE>";
     return $result;
   }
@@ -96,7 +96,8 @@ class VIES extends Component {
                             WHERE  organisation_id  = :organisation_id");
       $sth->execute(array(":organisation_vat" => $vat_number, "organisation_id" => $this->stone->Wizard->_data['organisationId']  ));
       */
-      $result['next_page'] = "vies_ok"; //debug
+      //$result['next_page'] = "vies_ok"; //debug
+      $result['next_page'] = $this->_donePage;
     } else {
       //TODO DEBUG
       //$result['error'] = "<PRE> vies_error\n". var_export($vat_validator,true) . "</pre>";

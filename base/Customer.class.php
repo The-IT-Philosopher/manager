@@ -44,17 +44,17 @@ class Customer extends Component {
     $this->stone->Wizard->registerPage(
       array("Customer_add_existing"=>array(
                                'render_xml'    => array( $this, "add_existing_render_xml"), 
-                               "process"       => array( $this, "add_existing_process"))));
+                               "process"       => array( $this, "add_process"))));
 
     $this->stone->Wizard->registerPage(
       array("Customer_add_existing_organisation"=>array(
                                'render_xml'    => array( $this, "add_existing_organisation_render_xml"), 
-                               "process"       => array( $this, "add_existing_process"))));
+                               "process"       => array( $this, "add_process"))));
 
     $this->stone->Wizard->registerPage(
       array("Customer_add_existing_person"=>array(
                                'render_xml'    => array( $this, "add_existing_person_render_xml"),   
-                               "process"       => array( $this, "add_existing_process"))));
+                               "process"       => array( $this, "add_process"))));
 
   }
 //------------------------------------------------------------------------------
@@ -69,28 +69,24 @@ class Customer extends Component {
     $this->stone->_data['content_raw'] .= "<A href='show'><button>Toon alle klanten</button></a><br>";
 
     if ($this->stone->_request[1]=="addnewperson") {
-    $this->stone->_data['content_raw'] .= "todo (addnewperson)<br>";
-/*
-      $this->stone->Wizard->initPage("Wizard_Organisation_ChooseCountry");
-      $this->stone->Organisation->setDonePage("person_enter");
+      $this->stone->Wizard->initPage("person_enter");
+      //$this->stone->Person->setDonePage("Customer_add_existing_person"); //?? handover
+      $this->stone->Person->setDonePage("address_enter"); //?? handover
+      $this->stone->Address->setDonePage("Customer_add_existing_person"); //?? handover
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
-*/
     }
 
     if ($this->stone->_request[1]=="addneworganisation") {
-
-      //TODO MOVE DATA TO WIZARD, IMPLEMENT RESET
       $this->stone->Wizard->initPage("Wizard_Organisation_ChooseCountry");
-      //TODO HANDOVER
-      $this->stone->Organisation->setDonePage("Customer_add_existing_organisation");
+      $this->stone->Organisation->setDonePage("Customer_add_existing_organisation"); //?? //handover
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
     }
 
     if ($this->stone->_request[1]=="addexistingperson") {
       $this->stone->Wizard->initPage("Customer_add_existing_person");
-      $this->stone->Organisation->setDonePage("done");
+      $this->stone->Person->setDonePage("done");
       $this->stone->Wizard->process();    
       $this->stone->Wizard->render();
     }
@@ -157,24 +153,33 @@ class Customer extends Component {
     $this->stone->_data['content_raw'] .= "</table>";
   }
 //------------------------------------------------------------------------------
-  function add_existing_process() {
+  function add_process() {
     $result = array();
-    if (isset($_POST['organisation_id'])) {
-      $this->addOrganisation($_POST['organisation_id']);
-      $result['next_page'] = "done";
-    }
-    if (isset($_POST['person_id'])) {
-      $this->addPerson($_POST['person_id']);
-      $result['next_page'] = "done";
-    }
 
-    // handover wizard
-    // TODO use same names, add person support
+      // handover issue:
+      // when a page has been processed, and a next page has been set
+      // the new page is not processed yet. For input pages this is
+      // good behavious. However, if a page render is to be skipped as
+      // data has been set... this will be an issue
+
+
+
     if (isset($this->stone->Wizard->_data['organisationId'])) {
       $this->addOrganisation($this->stone->Wizard->_data['organisationId']);
       $result['next_page'] = "done";
-    }
+    } else if (isset($this->stone->Wizard->_data['personId'])) {
+      $this->addPerson($this->stone->Wizard->_data['personId']);
+      $result['next_page'] = "done";
+    } else 
 
+
+    if (isset($_POST['organisation_id'])) {
+      $this->addOrganisation($_POST['organisation_id']);
+      $result['next_page'] = "done";
+    } else if (isset($_POST['person_id'])) {
+      $this->addPerson($_POST['person_id']);
+      $result['next_page'] = "done";
+    }
 
 
 
@@ -209,7 +214,7 @@ class Customer extends Component {
     $sth = $this->stone->pdo->prepare("SELECT person_id ,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name) as person_name
                                        FROM person
                                        WHERE person_id NOT IN 
-                                           ( SELECT organisation_id 
+                                           ( SELECT person_id 
                                              FROM link_customer2person
                                            )");
     $sth->execute();

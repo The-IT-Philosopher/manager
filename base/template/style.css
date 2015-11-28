@@ -176,8 +176,14 @@ html {
 
 
 .content {
+/*  does not quite work, scrollbar shows when content less then filling
   height: 0px; 
   min-height: 100%;
+*/
+
+/* just putting 0px, in combination with flex might work */
+  height: 0px; 
+
 }
 
 
