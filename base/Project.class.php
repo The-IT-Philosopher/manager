@@ -279,7 +279,11 @@ class Project extends Component {
       $result .= "<h2>".$projectCustomer['customer_name']."</h2>";
     }  
 
+    // TODO: We need a calendar generator
+    //       But this will be part of the new output generator engine to be
+    //        developed.
 
+                                         //-------------------------------------
     // begin hours for current month
     $sth = $this->stone->pdo->prepare("SELECT project_hours_date, sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time
                                        FROM project_hours  
@@ -297,14 +301,18 @@ class Project extends Component {
     $result .= "<STYLE>table, th, td { border: 1px solid black; }</STYLE>";
 
     $daysThisMonth = date("t");
-    $startDayMonth = date("w",strtotime(date("Y-m-01")));
+    $startDayMonth = date("w",strtotime(date("Y-").$currentMonth."-01")); 
+      // using currentMonth as variable to allow for different months to be displayed
+      // this should be part of the generating code -- also -- make the year a variable
+      // in the end we should not be creating raw html code anyways .... but that's 
+      // for later concern.
     $Month = array(); 
     $Week  = array();
     for ($day = 1 ; $day <= $daysThisMonth ; $day++) {
-      $checkdate = date("Y-m-") . sprintf("%02d",$day);
+      $checkdate = date("Y-")  . $currentMonth. "-" . sprintf("%02d",$day);
 
-      $hours = "<div class='d'>".date("d",strtotime($checkdate)) . "</div><div class='h'>" . (int)@$hoursThisMonth[$checkdate] ."</div>";
-
+      $hours = "<div class='d'>".date("d",strtotime($checkdate)) . "</div><div class='h'>" . (float)@$hoursThisMonth[$checkdate] ."</div>";
+//debug//      $hours = "<div class='d'>".$checkdate . "</div><div class='h'>" . (int)@$hoursThisMonth[$checkdate] ."</div>";
 
       $checkDay = date("w",strtotime($checkdate));
       if ($checkDay == 0) {
@@ -336,8 +344,17 @@ class Project extends Component {
     // end hours for current month
 */
 
+                                         //-------------------------------------
 
 
+    $sth = $this->stone->pdo->prepare("SELECT sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time
+                                       FROM project_hours  
+                                       WHERE MONTH(project_hours_date) = :currentMonth 
+                                             AND project_id = :projectId
+                                       GROUP BY  project_id" );
+    $sth->execute(array(":currentMonth"=>$currentMonth, ":projectId"=>$this->stone->Wizard->_data['projectId']));
+    $total_hours_this_month = (float)$sth->fetchColumn();
+    $result .= "<div>Total hours this month:    $total_hours_this_month </div>";
 /*
   this is a nice query for somewhere else, show hours per project per month, make a place for that
     $sth = $this->stone->pdo->prepare("SELECT project_id,  project_description_short
