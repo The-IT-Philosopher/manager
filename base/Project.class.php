@@ -285,7 +285,7 @@ class Project extends Component {
                                        FROM project_hours  
                                        WHERE MONTH(project_hours_date) = :currentMonth 
                                              AND project_hours.project_id = :projectId
-                                       ORDER BY  project_hours_date );
+                                       ORDER BY  project_hours_date" );
     $sth->execute(array(":currentMonth"=>$currentMonth, ":projectId"=>$this->stone->Wizard->_data['projectId']));
     $result .= "<h3>Uren in de huidige maand</h3><table><tr><th>Datum</th><th>Uur</th><th>Kwartier</th></tr>";
     while ($project_hour = $sth->fetch()) {
