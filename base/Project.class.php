@@ -278,6 +278,23 @@ class Project extends Component {
       $result .= "<h1>Klantinformatie</h1>";
       $result .= "<h2>".$projectCustomer['customer_name']."</h2>";
     }  
+
+
+    // begin hours for current month
+    $sth = $this->stone->pdo->prepare("SELECT project_hours_date, project_hours_hours, project_hours_quarters
+                                       FROM project_hours  
+                                       WHERE MONTH(project_hours_date) = :currentMonth 
+                                             AND project_hours.project_id = :projectId");
+    $sth->execute(array(":currentMonth"=>$currentMonth, ":projectId"=>$this->stone->Wizard->_data['projectId']));
+    $result .= "<h3>Uren in de huidige maand</h3><table><tr><th>Datum</th><th>Uur</th><th>Kwartier</th></tr>";
+    while ($project_hour = $sth->fetch()) {
+      $result .= "<tr><td>" . date("l d-m-Y", strtotime($project_hour['project_hours_date'])) . "</td><td>".
+                 $project_hour['project_hours_hours'] . "</td><td>".
+                 $project_hour['project_hours_quarters'] . "</td></tr>";
+    }
+    $result .= "</table>";
+    // end hours for current month
+
 /*
   this is a nice query for somewhere else, show hours per project per month, make a place for that
     $sth = $this->stone->pdo->prepare("SELECT project_id,  project_description_short
