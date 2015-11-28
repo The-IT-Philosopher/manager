@@ -281,12 +281,51 @@ class Project extends Component {
 
 
     // begin hours for current month
-    $sth = $this->stone->pdo->prepare("SELECT project_hours_date, project_hours_hours, project_hours_quarters
+    $sth = $this->stone->pdo->prepare("SELECT project_hours_date, sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time
                                        FROM project_hours  
                                        WHERE MONTH(project_hours_date) = :currentMonth 
                                              AND project_hours.project_id = :projectId
+                                       GROUP BY  project_hours_date
                                        ORDER BY  project_hours_date" );
     $sth->execute(array(":currentMonth"=>$currentMonth, ":projectId"=>$this->stone->Wizard->_data['projectId']));
+    //$hoursThisMonth = $sth->fetchAll();
+    $hoursThisMonth=array();
+    while ($project_hour = $sth->fetch()) {
+      $hoursThisMonth[$project_hour['project_hours_date']] = $project_hour['project_time'];
+    }
+
+    $result .= "<STYLE>table, th, td { border: 1px solid black; }</STYLE>";
+
+    $daysThisMonth = date("t");
+    $startDayMonth = date("w",strtotime(date("Y-m-01")));
+    $Month = array(); 
+    $Week  = array();
+    for ($day = 1 ; $day <= $daysThisMonth ; $day++) {
+      $checkdate = date("Y-m-") . sprintf("%02d",$day);
+
+      $hours = "<div class='d'>".date("d",strtotime($checkdate)) . "</div><div class='h'>" . (int)@$hoursThisMonth[$checkdate] ."</div>";
+
+
+      $checkDay = date("w",strtotime($checkdate));
+      if ($checkDay == 0) {
+        $Month[]=$Week;
+        $Week=array();
+      }
+      $Week[$checkDay] = $hours;
+    }
+    $Month[]=$Week;
+    $result .= "<table><tr><th>Zo</th><th>Ma</th><th>Di</th><th>Wo</th><th>Do</th><th>Vr</th><th>Za</th></tr>";
+    foreach ($Month as $Week) {
+
+      $result .= "<tr>";
+
+      for ($Day = 0 ; $Day < 7 ; $Day++) {
+        $result .= "<td>" . $Week[$Day] . "</td>";
+      }      
+
+    }
+    $result .= "</tr></table>";
+/*
     $result .= "<h3>Uren in de huidige maand</h3><table><tr><th>Datum</th><th>Uur</th><th>Kwartier</th></tr>";
     while ($project_hour = $sth->fetch()) {
       $result .= "<tr><td>" . date("l d-m-Y", strtotime($project_hour['project_hours_date'])) . "</td><td>".
@@ -295,6 +334,9 @@ class Project extends Component {
     }
     $result .= "</table>";
     // end hours for current month
+*/
+
+
 
 /*
   this is a nice query for somewhere else, show hours per project per month, make a place for that
