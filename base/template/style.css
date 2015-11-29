@@ -98,6 +98,14 @@ html {
   .container .center { width: 500px; }
 }
 
+/* TODO small screen support, disable the sidebars from here? */
+@media screen and (max-width: 899px) {
+  .container .center { width: 400px; }
+}
+
+
+
+
 /* 980 */
 @media screen and (min-width: 980px) and (max-width: 980px) {
   html { color : red; } /* some weird android case */
@@ -150,24 +158,40 @@ html {
 
 @media screen and (min-width: 600px) and (max-width: 699px) {
   /* we need different values, but just to be sure this is selected now */ 
-  .left, .right { width:150px; }
-  .header * img.logo, .header * .title  { height: 105px; }
-  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .left, .right { width:100px; }
+  .header * img.logo, .header * .title  { height: 75px; }
+  .header * .title { min-width: 175px; /* Normal "width" appears to be ignored */ }
   .header * .title .name { font-size: 28px; }
   .header * .title .slogan { font-size: 16px; }
+  .center { min-width: 175px; }
+
+  /* debug */
+  .header * .title .slogan:after {
+    content: "6xx";
+  }
+
 }
 
 
-@supports (touch-action: auto) {
-  /* Detect mobile device using css only */
-  /* experimental technology */
-  /* Microsoft Edge on a non-touch device also triggers this */
-  /* Chromium on non-touch devide as well */
-  /* Look up Media Quaries 4, there was something more usefull there*/
+/* TODO -- small screens*/
+@media screen and (max-width: 599px) {
+  /* we need different values, but just to be sure this is selected now */ 
+  .left, .right { width:75px; }
+  .header * img.logo, .header * .title  { height: 50px; }
+  .header * .title { min-width: 300px; /* Normal "width" appears to be ignored */ }
+  .header * .title .name { font-size: 20px; }
+  .header * .title .slogan { font-size: 12px; }
+}
+
+
+
+@media (pointer:coarse) {
+  /* the new way to detect touch input */
   body { color : blue; }
-  /* Use @import and allow other cases to import it as well
-     That should be the default for any case above anyways
-  */
+  button { 
+    height: 50px; 
+    margin-bottom: 10px;
+  }
 }
 
 /*  TODO */

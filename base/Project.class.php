@@ -283,6 +283,10 @@ class Project extends Component {
     //       But this will be part of the new output generator engine to be
     //        developed.
 
+    // TODO: Extract all this code below to make a generator for a selectable 
+    //          month. Something like generateCalendat($projectId, $month)
+    //          And make the date clickable to declare at the clicked date.
+
                                          //-------------------------------------
     // begin hours for current month
     $sth = $this->stone->pdo->prepare("SELECT project_hours_date, sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time

@@ -96,7 +96,7 @@ class Wizard extends Component {
 //------------------------------------------------------------------------------
   public function initPage($page) {
 
-    if ($this->_init_page == $this->_pages[$page]) return;
+    //if ($this->_init_page == $this->_pages[$page]) return;
 
     $this->_data = array();
     if (isset($this->_pages[$page])) {
