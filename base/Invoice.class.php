@@ -52,24 +52,24 @@ class Invoice extends Component {
     $this->stone->_data['content_raw'] .= "<table><tr><th></th><th></th><th></th><th></th></tr>";
     foreach ($data['products'] as $product) {
       $this->stone->_data['content_raw'] .= "<tr><td>" . $product['name'] . "</td><td>";
-      $this->stone->_data['content_raw'] .= $product['amount'] . "</td><td> €" . $product['price']/100;
-      $this->stone->_data['content_raw'] .= "</td><td>€ " . $product['total_price']/100 . "</td></tr>";
+      $this->stone->_data['content_raw'] .= $product['amount'] . "</td><td> €" . sprintf("%' 9.2f",$product['price']/100);
+      $this->stone->_data['content_raw'] .= "</td><td>€ " . sprintf("%' 9.2f",$product['total_price']/100) . "</td></tr>";
     }
 
     // tax
     foreach ($data['taxes'] as $tax) {
-      $this->stone->_data['content_raw'] .= "<tr><td>" . $tax['rate_rate_type'] . "</td><td>";
-      $this->stone->_data['content_raw'] .= $tax['tax_rate'] . "%</td><td> ";
-      $this->stone->_data['content_raw'] .= "</td><td>€ " . $tax['tax_amount']/100 . "</td></tr>";
+      $this->stone->_data['content_raw'] .= "<tr><td>BTW</td><td>" . $tax['rate_rate_type'] ;
+      $this->stone->_data['content_raw'] .= "</td><td>".$tax['tax_rate'] . "%";
+      $this->stone->_data['content_raw'] .= "</td><td>€ " . sprintf("%' 9.2f",$tax['tax_amount']/100) . "</td></tr>";
     }
 
     $this->stone->_data['content_raw'] .= "<tr><td>totaal exc. btw.</td><td>";
     $this->stone->_data['content_raw'] .= "</td><td> ";
-    $this->stone->_data['content_raw'] .= "</td><td>€ " . $data['total_price_ex']/100 . "</td></tr>";
+    $this->stone->_data['content_raw'] .= "</td><td>€ " . sprintf("%' 9.2f",$data['total_price_ex']/100) . "</td></tr>";
 
     $this->stone->_data['content_raw'] .= "<tr><td>totaal inc. btw.</td><td>";
     $this->stone->_data['content_raw'] .= "</td><td> ";
-    $this->stone->_data['content_raw'] .= "</td><td>€ " . $data['total_price_in']/100 . "</td></tr>";
+    $this->stone->_data['content_raw'] .= "</td><td>€ " . sprintf("%' 9.2f",$data['total_price_in']/100) . "</td></tr>";
 
 
     $this->stone->_data['content_raw'] .= "</table>";
