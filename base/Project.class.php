@@ -240,6 +240,65 @@ class Project extends Component {
   return $form->GenerateForm(NULL, "Kies project");
   }
 //------------------------------------------------------------------------------
+    function getBillingAddress($projectId){
+      return $this->stone->Customer->getCustomerAddress($this->getCustomerId($projectId),"billing");
+    }
+
+    function getCustomerInfo($projectId){
+    // getCustomerInfo()?? // getBillingAddress()
+
+
+      // for some reason this query appears to give duplicate results
+      // also, we need to specify billing addresses in the customer entry
+
+    
+      $sth = $this->stone->pdo->prepare("SELECT  customer_name, address_street, address_number,address_postalcode, address_city, address_province, address_country  FROM  
+                                         (SELECT * FROM 
+                                           (SELECT customer_id,organisation_name as customer_name, address.*
+                                            FROM   link_customer2organisation
+                                            JOIN   organisation 
+                                              ON link_customer2organisation.organisation_id = organisation.organisation_id 
+                                            JOIN   link_address2organisation 
+                                              ON link_address2organisation.organisation_id = organisation.organisation_id
+                                            JOIN address
+                                              ON link_address2organisation.address_id = address.address_id    
+                                            WHERE address_type = 'billing'  
+                                            ) as ALIAS_A
+                                            
+                                          UNION (SELECT customer_id,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name)  as customer_name,  address.*
+                                            FROM   link_customer2person
+                                            JOIN    person
+                                              ON link_customer2person.person_id = person.person_id 
+                                            JOIN   link_address2person 
+                                              ON link_address2person.person_id = person.person_id
+                                            JOIN address
+                                              ON link_address2person.address_id = address.address_id  
+                                            WHERE address_type = 'billing'      
+                                            ) 
+                                          ) as all_customers 
+                                         JOIN link_customer2project 
+                                           ON link_customer2project.customer_id = all_customers.customer_id 
+                                         WHERE project_id = :projectId");
+    // Damn it becomes a huge ugly query... it seems the (SELECT * FROM...) is required to give the result of the UNION an alias  
+
+      $sth->execute(array(":projectId"=>$projectId));
+      $result = $sth->fetch();
+
+
+      // I suppose we could use a different approach... getting the address should be part of customer
+
+      return $result;
+  }
+//------------------------------------------------------------------------------
+  function getCustomerId($projectId) {
+    $sth = $this->stone->pdo->prepare("SELECT customer_id 
+                                        FROM link_customer2project
+                                        WHERE project_id = :projectId");
+    $sth->execute(array(":projectId"=>$projectId));
+    return $sth->fetchColumn();
+  }
+
+//------------------------------------------------------------------------------
   function showProjectDetails_render_raw(){
     $result = "<p>RenderRawDetails<br>We need a new rederer soon</p>";
     $currentMonth = date("n");
@@ -255,25 +314,10 @@ class Project extends Component {
     // then perhaps something like below, hours per month or so
 
 
-    $sth = $this->stone->pdo->prepare("SELECT  all_customers.customer_id, customer_name  FROM 
-                                       (SELECT * FROM 
-                                         (SELECT customer_id,organisation_name as customer_name
-                                          FROM   link_customer2organisation
-                                          JOIN   organisation 
-                                          ON link_customer2organisation.organisation_id = organisation.organisation_id) as ALIAS_A
-                                        UNION (SELECT customer_id,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name)  as customer_name
-                                          FROM   link_customer2person
-                                          JOIN    person
-                                            ON link_customer2person.person_id = person.person_id ) 
-                                        ) as all_customers 
-                                       JOIN link_customer2project 
-                                         ON link_customer2project.customer_id = all_customers.customer_id 
-                                       JOIN project on project.project_id = link_customer2project.project_id
-                                       WHERE project.project_id = :projectId");
-// Damn it becomes a huge ugly query... it seems the (SELECT * FROM...) is required to give the result of the UNION an alias  
 
-    $sth->execute(array(":projectId"=>$this->stone->Wizard->_data['projectId']));
-    $projectCustomer = $sth->fetch();
+
+
+  $projectCustomer = $this->getCustomerInfo($this->stone->Wizard->_data['projectId']);
     if ($projectCustomer) {
       $result .= "<h1>Klantinformatie</h1>";
       $result .= "<h2>".$projectCustomer['customer_name']."</h2>";
@@ -337,28 +381,18 @@ class Project extends Component {
 
     }
     $result .= "</tr></table>";
-/*
-    $result .= "<h3>Uren in de huidige maand</h3><table><tr><th>Datum</th><th>Uur</th><th>Kwartier</th></tr>";
-    while ($project_hour = $sth->fetch()) {
-      $result .= "<tr><td>" . date("l d-m-Y", strtotime($project_hour['project_hours_date'])) . "</td><td>".
-                 $project_hour['project_hours_hours'] . "</td><td>".
-                 $project_hour['project_hours_quarters'] . "</td></tr>";
-    }
-    $result .= "</table>";
-    // end hours for current month
-*/
-
-                                         //-------------------------------------
 
 
-    $sth = $this->stone->pdo->prepare("SELECT sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time
-                                       FROM project_hours  
-                                       WHERE MONTH(project_hours_date) = :currentMonth 
-                                             AND project_id = :projectId
-                                       GROUP BY  project_id" );
-    $sth->execute(array(":currentMonth"=>$currentMonth, ":projectId"=>$this->stone->Wizard->_data['projectId']));
-    $total_hours_this_month = (float)$sth->fetchColumn();
-    $result .= "<div>Total hours this month:    $total_hours_this_month </div>";
+    $result .= "<div>Total hours this month: ".$this->getHoursForMonth($this->stone->Wizard->_data['projectId'],$currentMonth)."     </div>";
+
+
+    // very ugly in rendering we grab the user input
+    $result .= "<form method=post><button type=submit name=generateInvoice>Generate Invoice</button></form>"; // STUB
+    if (isset($_POST['generateInvoice'])) {
+      $data = $this->stone->Invoice->generateProjectMonthly($this->stone->Wizard->_data['projectId'], $currentMonth);
+      $this->stone->Invoice->displayInvoice($data);
+    } 
+
 /*
   this is a nice query for somewhere else, show hours per project per month, make a place for that
     $sth = $this->stone->pdo->prepare("SELECT project_id,  project_description_short
@@ -368,6 +402,38 @@ class Project extends Component {
                                        WHERE MONTH(project_hours_date) = :currentMonth GROUP BY project_id");
     $sth->execute(array(":currentMonth"=>$currentMonth));
 */
+    return $result;
+  }
+//------------------------------------------------------------------------------
+  function getHoursForMonth($projectId, $month ,$billable=NULL, $billed = NULL) {
+    $query = "SELECT sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time
+                                       FROM project_hours  
+                                       WHERE MONTH(project_hours_date) = :month 
+                                             AND project_id = :projectId ";
+
+    if ($billed !== NULL) {
+      $query .= " AND project_hours_billed = " . ($billed ? "1 " : "0 ");
+    }
+
+    if ($billable !== NULL) {
+      $query .= " AND project_hours_billable = " . ($billable ? "1 " : "0 ");
+    }
+
+
+
+    $query .= " GROUP BY  project_id"; 
+
+    $sth = $this->stone->pdo->prepare($query);
+    $sth->execute(array(":month"=>$month, ":projectId"=>$projectId));
+    return  (float)$sth->fetchColumn();
+ 
+  }
+//------------------------------------------------------------------------------
+  function getProjectInfo($projectId) {
+
+    $sth = $this->stone->pdo->prepare("SELECT * FROM project WHERE project_id = :projectId");
+    $sth->execute(array(":projectId"=>$projectId));
+    $result =  $sth->fetch();
     return $result;
   }
 //------------------------------------------------------------------------------

@@ -34,7 +34,7 @@ class Component {
 
   protected $stone;
   public function load($stone) {
-    $this->stone = $stone;
+    $this->stone = &$stone;
   }
 
 

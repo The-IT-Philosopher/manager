@@ -230,6 +230,46 @@ class Customer extends Component {
 
 //------------------------------------------------------------------------------
 
+  function getCustomerAddress($customerId, $addressType=NULL) {
 
+    $query = "SELECT  *  FROM  
+                                           (SELECT customer_id,organisation_name as customer_name, address.*
+                                            FROM   link_customer2organisation
+                                            JOIN   organisation 
+                                              ON link_customer2organisation.organisation_id = organisation.organisation_id 
+                                            JOIN   link_address2organisation 
+                                              ON link_address2organisation.organisation_id = organisation.organisation_id
+                                            JOIN address
+                                              ON link_address2organisation.address_id = address.address_id "   ;
+          if ($addressType!=NULL) $query.= "WHERE address_type = :addressType ";
+                                  $query.= ") as ALIAS_A
+                                          UNION (SELECT customer_id,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name)  as customer_name,  address.*
+                                            FROM   link_customer2person
+                                            JOIN    person
+                                              ON link_customer2person.person_id = person.person_id 
+                                            JOIN   link_address2person 
+                                              ON link_address2person.person_id = person.person_id
+                                            JOIN address
+                                              ON link_address2person.address_id = address.address_id "   ;
+          if ($addressType!=NULL) $query.= "WHERE address_type = :addressType ";
+          $query.= ")";
+    
+      $sth = $this->stone->pdo->prepare($query);
+    // Damn it becomes a huge ugly query... it seems the (SELECT * FROM...) is required to give the result of the UNION an alias  
+      $queryArray = array(":customerId"=>$customerId);
+      if ($addressType!=NULL) $queryArray['addressType']=$addressType;
+      $sth->execute($queryArray);
+      $result = $sth->fetch(\PDO::FETCH_ASSOC);
+
+      if (false===$result) {
+        $result = $sth->errorInfo();
+         $this->stone->_data['content_raw'] .= "<PRE>$query </PRE>";
+      }
+
+      // I suppose we could use a different approach... getting the address should be part of customer
+
+      return $result;
+
+  }
 
 }

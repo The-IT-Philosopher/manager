@@ -1,0 +1,6 @@
+<?php
+$DBHOST = "localhost";
+$DBUSER = "myDatabaseUserName";
+$DBNAME = "myDatabaseNamer";
+$DBPASS = "myDatabasePassword";
+?>
