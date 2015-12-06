@@ -289,7 +289,7 @@ class Project extends Component {
       $this->stone->Wizard->_data['invoiceData'] = $this->stone->Invoice->generateProjectMonthly($this->stone->Wizard->_data['projectId'], $month[1], $month[0],  ($_POST['already_billed'] ? NULL : 0)  );
       $result['next_page'] = "invoiceWizard_verifyInvoice";
     } else     if (strlen(@$_POST['begin']) && strlen(@$_POST['end'])) {
-      $this->stone->Wizard->_data['invoiceData'] = $this->stone->Invoice->generateProjectPeriod($this->stone->Wizard->_data['projectId'], $_POST['begin'], $_POST['$end'],  ($_POST['already_billed'] ? NULL : 0)  );
+      $this->stone->Wizard->_data['invoiceData'] = $this->stone->Invoice->generateProjectPeriod($this->stone->Wizard->_data['projectId'], $_POST['begin'], $_POST['end'],  ($_POST['already_billed'] ? NULL : 0)  );
       $result['next_page'] = "invoiceWizard_verifyInvoice";
 
     }

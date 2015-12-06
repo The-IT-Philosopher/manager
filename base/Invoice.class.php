@@ -85,7 +85,7 @@ function generateProjectPeriod($projectId, $begin, $end, $alreadyBilled=false){
     $Month = date("m", strtotime($begin));
     $Year  = date("Y", strtotime($begin));
 
-    $this->stone->_data['content_raw'] .= "<PRE>\nBegin: $begin \nMonth: $Month \nYear:$Year</PRE>";
+    $this->stone->_data['content_raw'] .= "<PRE>\nBegin: $begin \nEnd: $end \nMonth: $Month \nYear:$Year</PRE>";
     $product['name'] = $project_name ." (" . strftime("%B", strtotime("${Year}-${Month}") ) .")";
 
     switch ($info['project_billing_type']) {
