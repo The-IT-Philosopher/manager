@@ -48,7 +48,10 @@ namespace Philosopher;
 try {
   ob_start();
   session_start();
-  date_default_timezone_set("UTC"); // to stop warnings
+
+  setlocale(LC_ALL, 'nl_NL');
+  date_default_timezone_set("UTC");
+
   if (isset($_GET['reset'])) unset ($_SESSION['stone']); // test
   if ( isset($_SESSION['stone'])) {
     $stone = $_SESSION['stone'];

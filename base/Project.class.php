@@ -53,6 +53,27 @@ class Project extends Component {
                                'render_xml'    => array( $this, "chooseproject_render_xml"), 
                                "process"       => array( $this, "chooseproject_view_process"))));
 
+    $this->stone->Wizard->registerPage(
+      array("chooseproject_invoice"=>array(
+                               'render_xml'    => array( $this, "chooseproject_render_xml"), 
+                               "process"       => array( $this, "chooseproject_invoice_process"))));
+
+
+    $this->stone->Wizard->registerPage(
+      array("invoiceWizard_verifyInvoice"=>array(
+                               'render_raw'    => array( $this, "invoiceWizard_verifyInvoice_render_raw"), 
+                               "process"       => array( $this, "invoiceWizard_verifyInvoice_process"))));
+
+//
+
+
+    $this->stone->Wizard->registerPage(
+      array("invoiceWizard_chooseMonth"=>array(
+                               'render_xml'    => array( $this, "invoiceWizard_chooseMonth_render_xml"), 
+                               "process"       => array( $this, "invoiceWizard_chooseMonth_process"))));
+
+
+
   $this->stone->Wizard->registerPage(
       array("showProjectDetails"=>array(
                                'render_raw'    => array( $this, "showProjectDetails_render_raw"), 
@@ -88,6 +109,7 @@ class Project extends Component {
     $this->stone->_data['content_raw'] .= "<a href=add><button>Nieuw Project</button></a>";
     $this->stone->_data['content_raw'] .= "<a href=declare><button>Uren declareren</button></a>";
     $this->stone->_data['content_raw'] .= "<a href=view><button>Projecten tonen</button></a>";
+    $this->stone->_data['content_raw'] .= "<a href=invoice><button>Facturatie</button></a>";
 
 
     // TODO I suppose we should register subpages and add a WizardPage
@@ -105,6 +127,12 @@ class Project extends Component {
       case "view":
         //$this->view();
         $this->stone->Wizard->initPage("chooseproject_view");
+        $this->stone->Wizard->process();    
+        $this->stone->Wizard->render();          
+        break;
+      case "invoice":
+        //$this->view();
+        $this->stone->Wizard->initPage("chooseproject_invoice");
         $this->stone->Wizard->process();    
         $this->stone->Wizard->render();          
         break;
@@ -240,8 +268,107 @@ class Project extends Component {
   return $form->GenerateForm(NULL, "Kies project");
   }
 //------------------------------------------------------------------------------
+  function invoiceWizard_chooseMonth_render_xml() {
+    $form = new Form();
+    $form->addElement(new FormInputElement("month","Maand", "month"));
+    $form->addElement(new FormInputElement("already_billed","Hergenereer", "checkbox"));
+    return $form->GenerateForm(NULL, "Kies maand");
+}
+//------------------------------------------------------------------------------
+  function invoiceWizard_chooseMonth_process() {
+    $result = array();
+
+    //DEBUG
+    //$this->stone->_data['content_raw'] .= "<PRE>" . var_export($_POST,true) . "</PRE>";
+
+    if (isset($_POST['month'])) {
+      $month = explode("-",$_POST['month']);
+      //$this->stone->_data['content_raw'] .= "<PRE>" . var_export($month,true) . "</PRE>";
+      $this->stone->Wizard->_data['invoiceData'] = $this->stone->Invoice->generateProjectMonthly($this->stone->Wizard->_data['projectId'], $month[1], $month[0],  ($_POST['already_billed'] ? NULL : 0)  );
+      $result['next_page'] = "invoiceWizard_verifyInvoice";
+    }
+
+    return $result;
+  }
+//------------------------------------------------------------------------------
+
+  function getHourIdsForMonth($projectId, $month=NULL , $year=NULL ,$billable=NULL, $billed = NULL) {
+    if ($month==NULL) $month = date("n");    
+    if ($year==NULL) $year = date("Y");
+
+    $query = "SELECT project_hours_id
+                                       FROM project_hours  
+                                       WHERE MONTH(project_hours_date) = :month
+                                        AND YEAR(project_hours_date) = :year 
+                                             AND project_id = :projectId ";
+
+    if ($billed !== NULL) {
+      $query .= " AND project_hours_billed = " . ($billed ? "1 " : "0 ");
+    }
+
+    if ($billable !== NULL) {
+      $query .= " AND project_hours_billable = " . ($billable ? "1 " : "0 ");
+    }
+
+
+
+
+
+    $sth = $this->stone->pdo->prepare($query);
+    $sth->execute(array(":year"=>$year, ":month"=>$month, ":projectId"=>$projectId));
+    return $sth->fetchAll(\PDO::FETCH_COLUMN);
+
+ 
+  }
+//------------------------------------------------------------------------------
+  function invoiceWizard_verifyInvoice_render_raw() {
+    //TODO STUB !!! RAW RENDERING!!! AND EVEN NOT DONE CORRECTLY
+    $this->stone->Invoice->displayInvoice($this->stone->Wizard->_data['invoiceData']);
+    $form = "<FORM METHOD=POST><TABLE>";
+    $form .= "<tr><td>Factuurdatum</td><td><input type=date name=date value=".date('Y-m-d') ."></td></tr>";
+    $form .= "<TR><TD><INPUT NAME=AcceptInvoice TYPE=SUBMIT VALUE=OK></td></tr></table></FORM>";
+    return $form;
+  }
+
+
+//------------------------------------------------------------------------------
+  function invoiceWizard_verifyInvoice_process() {
+    if (isset($_POST['AcceptInvoice'])) {
+      // steps :
+      // generate new invoice           V
+      // add hour_ids to link table
+      // mark hours as billed
+
+
+      // TODO:: to be moved to invoice
+      $sth = $this->stone->pdo->prepare("INSERT INTO invoice (customer_id, invoice_sequence_nr, invoice_date) 
+      VALUES
+      (:customer_id, 
+( SELECT 1 + IFNULL(MAX(invoice_sequence_nr),0) FROM invoice i2 WHERE customer_id = :customer_id ) ,
+      :invoice_date) ");
+
+      $invoice_date = $_POST['date'];
+      $customer_id = $this->stone->Wizard->_data['invoiceData']['customer_id'];
+      $sth->execute(array("customer_id" => $customer_id, ":invoice_date" => $invoice_date));
+      $invoice_id = $this->stone->pdo->lastInsertId();
+      
+      foreach ($this->stone->Wizard->_data['invoiceData']['project_hours_id'] as $project_hour) {
+        $sth = $this->stone->pdo->prepare("INSERT INTO link_invoice2project_hours 
+                                           (invoice_id, project_hours_id)
+                                        VALUES (:invoice_id, :project_hours_id)" );
+        $sth->execute(array(":invoice_id" => $invoice_id, "project_hours_id" => $project_hour));
+
+        $sth = $this->stone->pdo->prepare("UPDATE project_hours SET project_hours_billed = 1 WHERE project_hours_id = :project_hours_id");
+        $sth->execute(array("project_hours_id" => $project_hour));
+        
+      }
+    }    
+  }
+
+//------------------------------------------------------------------------------
     function getBillingAddress($projectId){
-      return $this->stone->Customer->getCustomerAddress($this->getCustomerId($projectId),"billing");
+      $result = $this->stone->Customer->getCustomerAddress($this->getCustomerId($projectId));//,"billing");
+      return $result;
     }
 
     function getCustomerInfo($projectId){
@@ -262,7 +389,7 @@ class Project extends Component {
                                               ON link_address2organisation.organisation_id = organisation.organisation_id
                                             JOIN address
                                               ON link_address2organisation.address_id = address.address_id    
-                                            WHERE address_type = 'billing'  
+                                            # WHERE address_type = 'billing'  
                                             ) as ALIAS_A
                                             
                                           UNION (SELECT customer_id,CONCAT_WS(' ',person_first_name,person_last_name_prefix,person_last_name)  as customer_name,  address.*
@@ -273,7 +400,7 @@ class Project extends Component {
                                               ON link_address2person.person_id = person.person_id
                                             JOIN address
                                               ON link_address2person.address_id = address.address_id  
-                                            WHERE address_type = 'billing'      
+                                            # WHERE address_type = 'billing'      
                                             ) 
                                           ) as all_customers 
                                          JOIN link_customer2project 
@@ -405,10 +532,14 @@ class Project extends Component {
     return $result;
   }
 //------------------------------------------------------------------------------
-  function getHoursForMonth($projectId, $month ,$billable=NULL, $billed = NULL) {
+  function getHoursForMonth($projectId, $month=NULL , $year=NULL ,$billable=NULL, $billed = NULL) {
+    if ($month==NULL) $month = date("n");    
+    if ($year==NULL) $year = date("Y");
+
     $query = "SELECT sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time
                                        FROM project_hours  
-                                       WHERE MONTH(project_hours_date) = :month 
+                                       WHERE MONTH(project_hours_date) = :month
+                                        AND YEAR(project_hours_date) = :year 
                                              AND project_id = :projectId ";
 
     if ($billed !== NULL) {
@@ -424,7 +555,7 @@ class Project extends Component {
     $query .= " GROUP BY  project_id"; 
 
     $sth = $this->stone->pdo->prepare($query);
-    $sth->execute(array(":month"=>$month, ":projectId"=>$projectId));
+    $sth->execute(array(":year"=>$year, ":month"=>$month, ":projectId"=>$projectId));
     return  (float)$sth->fetchColumn();
  
   }
@@ -441,6 +572,15 @@ class Project extends Component {
     $result = array();
     if (isset($_POST['project_id'])){
       $result['next_page']="declareWizard_declaretime";
+      $this->stone->Wizard->_data['projectId'] = $_POST['project_id'];
+    } 
+    return $result;
+  }
+//------------------------------------------------------------------------------
+  function chooseproject_invoice_process(){
+    $result = array();
+    if (isset($_POST['project_id'])){
+      $result['next_page']="invoiceWizard_chooseMonth";
       $this->stone->Wizard->_data['projectId'] = $_POST['project_id'];
     } 
     return $result;

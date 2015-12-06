@@ -46,10 +46,10 @@ class Invoice extends Component {
     $address = str_replace("{address_number}", $data['address']['address_number'], $address);
     $address = str_replace("{address_postalcode}", $data['address']['address_postalcode'], $address);
     $address = str_replace("{address_city}", $data['address']['address_city'], $address);
-    $this->stone->_data['content_raw'] .= "<PRE>" . var_export($data,true) . "</PRE>";
-    $this->stone->_data['content_raw'] .= "<PRE>Formatted Address:\n$address </PRE>";
+$this->stone->_data['content_raw'] .= "<PRE>" . var_export($data,true) . "</PRE>";
+    $this->stone->_data['content_raw'] .= "<PRE>$address </PRE>";
 
-    $this->stone->_data['content_raw'] .= "<table><tr><th></th><th></th><th></th><th></th></tr>";
+    $this->stone->_data['content_raw'] .= "<PRE><table><tr><th></th><th></th><th></th><th></th></tr>";
     foreach ($data['products'] as $product) {
       $this->stone->_data['content_raw'] .= "<tr><td>" . $product['name'] . "</td><td>";
       $this->stone->_data['content_raw'] .= $product['amount'] . "</td><td> €" . sprintf("%' 9.2f",$product['price']/100);
@@ -72,19 +72,20 @@ class Invoice extends Component {
     $this->stone->_data['content_raw'] .= "</td><td>€ " . sprintf("%' 9.2f",$data['total_price_in']/100) . "</td></tr>";
 
 
-    $this->stone->_data['content_raw'] .= "</table>";
+    $this->stone->_data['content_raw'] .= "</table></PRE>";
   }
 
-  function generateProjectMonthly($projectId, $Month){
+  function generateProjectMonthly($projectId, $Month=NULL, $Year=NULL, $alreadyBilled=false){
     $info    = $this->stone->Project->getProjectInfo($projectId);
     $address = $this->stone->Project->getBillingAddress($projectId);
     $product = array();
     $project_name = $info['project_description_short'];
-    $product['name'] = $project_name;
+    $product['name'] = $project_name ." (" . strftime("%B", strtotime("${Year}-${Month}") ) .")";
 
     switch ($info['project_billing_type']) {
       case "timed":
-        $hours = $this->stone->Project->getHoursForMonth($projectId, $Month, true, false);
+        $hours = $this->stone->Project->getHoursForMonth($projectId, $Month, $Year, true, $alreadyBilled);
+        $hourIds = $this->stone->Project->getHourIdsForMonth($projectId, $Month, $Year, true, $alreadyBilled);
         $product['amount'] = $hours;
         $rate  = $info['project_billing_rate'];
         $product['price'] = $rate;
@@ -118,8 +119,15 @@ class Invoice extends Component {
     $taxes = array ($tax);
 
     $total_price = $product['total_price'];    
-    $data = array("address" => $address , "products"=>$products, "taxes" => $taxes, "total_price_ex" => $total_price, "total_price_in" => $total_price + $tax_amount, "currency" => $info['project_billing_currency']);
+    $customer_id = $address['customer_id'];
+    $data = array("customer_id"=>$customer_id, "month"=> $Month, "year"=> $Year, "address" => $address , "products"=>$products, "taxes" => $taxes, "total_price_ex" => $total_price, "total_price_in" => $total_price + $tax_amount, "currency" => $info['project_billing_currency']);
+    if (isset($hourIds)) $data['project_hours_id'] = $hourIds;
     
     return $data;
   }
+
+  function getInvoice($invoice_id) {
+    
+  }
+
 }
