@@ -74,7 +74,67 @@ $this->stone->_data['content_raw'] .= "<PRE>" . var_export($data,true) . "</PRE>
 
     $this->stone->_data['content_raw'] .= "</table></PRE>";
   }
+//------------------------------------------------------------------------------
+function generateProjectPeriod($projectId, $begin, $end, $alreadyBilled=false){
+    $info    = $this->stone->Project->getProjectInfo($projectId);
+    $address = $this->stone->Project->getBillingAddress($projectId);
+    $product = array();
+    $project_name = $info['project_description_short'];
 
+
+    $Month = date("m", strtotime($begin));
+    $Year  = date("Y", strtotime($begin));
+
+    $this->stone->_data['content_raw'] .= "<PRE>\nBegin: $begin \nMonth: $Month \nYear:$Year</PRE>";
+    $product['name'] = $project_name ." (" . strftime("%B", strtotime("${Year}-${Month}") ) .")";
+
+    switch ($info['project_billing_type']) {
+      case "timed":
+        $hours = $this->stone->Project->getHoursForMonth($projectId, $Month, $Year, true, $alreadyBilled);
+        $hourIds = $this->stone->Project->getHoursForPeriod($projectId, $begin, $end, true, $alreadyBilled);
+        $product['amount'] = $hours;
+        $rate  = $info['project_billing_rate'];
+        $product['price'] = $rate;
+        $amount = round($hours * $rate);
+        $product['total_price'] = $amount;
+        break;
+      case "fixed":
+        $amount = $info['project_billing_rate'];
+        $product['amount'] = 1;
+        $product['price'] = $amount;
+        $product['total_price'] = $amount;
+        break;
+      case "free":
+        $amount = 1;
+        $product['amount'] = 1;
+        $product['price'] = 0;
+        $product['total_price'] = 0;
+    }
+    $products = array($product);
+
+
+    // TODO: determine taxrate
+    // To do this, we need to determine the country, product type, customer type
+    // and collect the data for all EU countries. 
+    // However, since we're generating for a project now, 
+    // it will be tax rate "high", which is 21 for the Netherlands
+    $tax_rate = 21;
+    $tax_amount = round(($tax_rate * $amount) / 100);
+
+    $tax = array ("rate_rate_type"=>"high", "tax_rate"=>$tax_rate, "tax_amount"=> $tax_amount);
+    $taxes = array ($tax);
+
+    $total_price = $product['total_price'];    
+    $customer_id = $address['customer_id'];
+
+    $data = array("customer_id"=>$customer_id, "month"=> $Month, "year"=> $Year, "address" => $address , "products"=>$products, "taxes" => $taxes, "total_price_ex" => $total_price, "total_price_in" => $total_price + $tax_amount, "currency" => $info['project_billing_currency']);
+    if (isset($hourIds)) $data['project_hours_id'] = $hourIds;
+    
+    return $data;
+  }
+
+
+//------------------------------------------------------------------------------
   function generateProjectMonthly($projectId, $Month=NULL, $Year=NULL, $alreadyBilled=false){
     $info    = $this->stone->Project->getProjectInfo($projectId);
     $address = $this->stone->Project->getBillingAddress($projectId);

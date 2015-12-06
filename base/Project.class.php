@@ -271,6 +271,8 @@ class Project extends Component {
   function invoiceWizard_chooseMonth_render_xml() {
     $form = new Form();
     $form->addElement(new FormInputElement("month","Maand", "month"));
+    $form->addElement(new FormInputElement("begin","Begin", "date"));
+    $form->addElement(new FormInputElement("end","Eind", "date"));
     $form->addElement(new FormInputElement("already_billed","Hergenereer", "checkbox"));
     return $form->GenerateForm(NULL, "Kies maand");
 }
@@ -281,11 +283,15 @@ class Project extends Component {
     //DEBUG
     //$this->stone->_data['content_raw'] .= "<PRE>" . var_export($_POST,true) . "</PRE>";
 
-    if (isset($_POST['month'])) {
+    if (strlen(@$_POST['month'])) {
       $month = explode("-",$_POST['month']);
       //$this->stone->_data['content_raw'] .= "<PRE>" . var_export($month,true) . "</PRE>";
       $this->stone->Wizard->_data['invoiceData'] = $this->stone->Invoice->generateProjectMonthly($this->stone->Wizard->_data['projectId'], $month[1], $month[0],  ($_POST['already_billed'] ? NULL : 0)  );
       $result['next_page'] = "invoiceWizard_verifyInvoice";
+    } else     if (strlen(@$_POST['begin']) && strlen(@$_POST['end'])) {
+      $this->stone->Wizard->_data['invoiceData'] = $this->stone->Invoice->generateProjectPeriod($this->stone->Wizard->_data['projectId'], $_POST['begin'], $_POST['$end'],  ($_POST['already_billed'] ? NULL : 0)  );
+      $result['next_page'] = "invoiceWizard_verifyInvoice";
+
     }
 
     return $result;
@@ -559,6 +565,34 @@ class Project extends Component {
     return  (float)$sth->fetchColumn();
  
   }
+//------------------------------------------------------------------------------
+  function getHoursForPeriod($projectId, $begin, $end ,$billable=NULL, $billed = NULL) {
+
+
+    $query = "SELECT sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time
+                                       FROM project_hours  
+                                       WHERE project_hours_date >= :begin
+                                        AND Yproject_hours_date <= :end
+                                             AND project_id = :projectId ";
+
+    if ($billed !== NULL) {
+      $query .= " AND project_hours_billed = " . ($billed ? "1 " : "0 ");
+    }
+
+    if ($billable !== NULL) {
+      $query .= " AND project_hours_billable = " . ($billable ? "1 " : "0 ");
+    }
+
+
+
+    $query .= " GROUP BY  project_id"; 
+
+    $sth = $this->stone->pdo->prepare($query);
+    $sth->execute(array(":begin"=>$begin, ":end"=>$end, ":projectId"=>$projectId));
+    return  (float)$sth->fetchColumn();
+ 
+  }
+
 //------------------------------------------------------------------------------
   function getProjectInfo($projectId) {
 
