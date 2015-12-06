@@ -90,8 +90,8 @@ function generateProjectPeriod($projectId, $begin, $end, $alreadyBilled=false){
 
     switch ($info['project_billing_type']) {
       case "timed":
-        $hours = $this->stone->Project->getHoursForMonth($projectId, $Month, $Year, true, $alreadyBilled);
-        $hourIds = $this->stone->Project->getHoursForPeriod($projectId, $begin, $end, true, $alreadyBilled);
+        $hours = $this->stone->Project->getHoursForPeriod($projectId, $begin, $end, true, $alreadyBilled);
+        $hourIds = $this->stone->Project->getHourIdsForPeriod($projectId, $begin, $end, true, $alreadyBilled);
         $product['amount'] = $hours;
         $rate  = $info['project_billing_rate'];
         $product['price'] = $rate;

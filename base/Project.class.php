@@ -298,6 +298,34 @@ class Project extends Component {
   }
 //------------------------------------------------------------------------------
 
+  function getHourIdsForPeriod($projectId, $begin, $end ,$billable=NULL, $billed = NULL) {
+    
+
+    $query = "SELECT project_hours_id
+                                       FROM project_hours  
+                                       WHERE project_hours_date >= :begin
+                                        AND project_hours_date <= :end
+                                             AND project_id = :projectId ";
+
+    if ($billed !== NULL) {
+      $query .= " AND project_hours_billed = " . ($billed ? "1 " : "0 ");
+    }
+
+    if ($billable !== NULL) {
+      $query .= " AND project_hours_billable = " . ($billable ? "1 " : "0 ");
+    }
+
+
+
+
+
+    $sth = $this->stone->pdo->prepare($query);
+    $sth->execute(array(":begin"=>$begin, ":end"=>$end, ":projectId"=>$projectId));
+    return $sth->fetchAll(\PDO::FETCH_COLUMN);
+
+ 
+  }
+//------------------------------------------------------------------------------
   function getHourIdsForMonth($projectId, $month=NULL , $year=NULL ,$billable=NULL, $billed = NULL) {
     if ($month==NULL) $month = date("n");    
     if ($year==NULL) $year = date("Y");
@@ -569,11 +597,14 @@ class Project extends Component {
   function getHoursForPeriod($projectId, $begin, $end ,$billable=NULL, $billed = NULL) {
 
 
+
     $query = "SELECT sum(project_hours_hours) + 0.25 * sum(project_hours_quarters) as project_time
                                        FROM project_hours  
                                        WHERE project_hours_date >= :begin
-                                        AND Yproject_hours_date <= :end
+                                        AND project_hours_date <= :end
                                              AND project_id = :projectId ";
+
+
 
     if ($billed !== NULL) {
       $query .= " AND project_hours_billed = " . ($billed ? "1 " : "0 ");
@@ -589,7 +620,11 @@ class Project extends Component {
 
     $sth = $this->stone->pdo->prepare($query);
     $sth->execute(array(":begin"=>$begin, ":end"=>$end, ":projectId"=>$projectId));
-    return  (float)$sth->fetchColumn();
+
+    $result = (float)$sth->fetchColumn();
+    echo "<PRE>"; var_export($result); echo "</PRE>"; // direct output!!!!
+    return $result;
+    //return  (float)$sth->fetchColumn();
  
   }
 
