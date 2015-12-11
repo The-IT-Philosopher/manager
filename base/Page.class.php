@@ -38,12 +38,18 @@ class Page extends Component {
 //------------------------------------------------------------------------------
   public function render() {
   //TODO STUB
-    if (isset($this->_pages[$this->stone->_request[0]])){
-      //TODO RENDERING ENGINE
-      // perhaps this needs a different name then "process" 
-      $content = call_user_func($this->_pages[$this->stone->_request[0]]['process']);
+  // TODO ACL
+    if (in_array("admin", $this->cap) || $this->stone->_request[0]=="login") {
+      if (isset($this->_pages[$this->stone->_request[0]])){
+        //TODO RENDERING ENGINE
+        // perhaps this needs a different name then "process" 
+        $content = call_user_func($this->_pages[$this->stone->_request[0]]['process']);
+      } else {
+        //404
+        $this->_data['content_raw'] .= "PAGE NOT FOUND";
+      }
     } else {
-      //404
+      $this->_data['content_raw'] .= "INSUFFUCIENT CAPABILITIES";
     }
   }
 //------------------------------------------------------------------------------
