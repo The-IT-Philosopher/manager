@@ -39,7 +39,7 @@ class Page extends Component {
   public function render() {
   //TODO STUB
   // TODO ACL
-    if (in_array("admin", $this->cap) || $this->stone->_request[0]=="login") {
+    if (in_array("admin", $this->stone->cap) || $this->stone->_request[0]=="login") {
       if (isset($this->_pages[$this->stone->_request[0]])){
         //TODO RENDERING ENGINE
         // perhaps this needs a different name then "process" 
