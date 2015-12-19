@@ -46,7 +46,8 @@ namespace Philosopher;
     spl_autoload_register('Philosopher\interfaceLoader');
 //------------------------------------------------------------------------------
 try {
-  ob_start();
+  ob_start(); 
+  //ob_end_flush(); // debug: it seems output buffering is enabled by default on dev server?
   session_start();
 
   setlocale(LC_ALL, 'nl_NL');
@@ -79,6 +80,8 @@ try {
     $stone->registerComponent(new Test_Wizard());
     $stone->registerComponent(new DP_OverheidIO());
   //
+
+    $stone->registerComponent(new RenderPDF());
     //$stone->registerComponent(new RenderXML());
     //$stone->registerComponent(new RenderJSON());
     //$stone->registerComponent(new RenderHTML3());

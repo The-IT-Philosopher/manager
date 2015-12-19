@@ -103,6 +103,3 @@ class DatabaseConnection extends Component{
 }
 
 
-?>
-
-

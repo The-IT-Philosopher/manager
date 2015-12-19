@@ -75,6 +75,13 @@ $this->stone->_data['content_raw'] .= "<PRE>" . var_export($data,true) . "</PRE>
     $this->stone->_data['content_raw'] .= "</table></PRE>";
   }
 //------------------------------------------------------------------------------
+  function generateInvoice($data){
+    // stub overriding rendering method
+    $this->stone->RenderPDF->render($data);
+    die(); 
+  }
+
+//------------------------------------------------------------------------------
 function generateProjectPeriod($projectId, $begin, $end, $alreadyBilled=false){
     $info    = $this->stone->Project->getProjectInfo($projectId);
     $address = $this->stone->Project->getBillingAddress($projectId);

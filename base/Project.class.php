@@ -551,7 +551,8 @@ class Project extends Component {
     $result .= "<form method=post><button type=submit name=generateInvoice>Generate Invoice</button></form>"; // STUB
     if (isset($_POST['generateInvoice'])) {
       $data = $this->stone->Invoice->generateProjectMonthly($this->stone->Wizard->_data['projectId'], $currentMonth);
-      $this->stone->Invoice->displayInvoice($data);
+      //$this->stone->Invoice->displayInvoice($data);
+      $this->stone->Invoice->generateInvoice($data);
     } 
 
 /*
