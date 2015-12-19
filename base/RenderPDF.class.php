@@ -108,34 +108,35 @@ class RenderPDF extends Component implements Render {
     $pdf->SetY(90);
     $pdf->Multicell(0, 0, $invoice_data);
 
-/* STUB -- as copied from Invoice::displayInvoice */
-    $html .= "<table><tr><th></th><th></th><th></th><th></th></tr>";
+
     foreach ($data['products'] as $product) {
-      $html .= "<tr><td>" . $product['name'] . "</td><td>";
-      $html .= $product['amount'] . "</td><td> €" . sprintf("%' 9.2f",$product['price']/100);
-      $html .= "</td><td>€ " . sprintf("%' 9.2f",$product['total_price']/100) . "</td></tr>";
+      // TODO reserve space for product numbers?
+      $product_name_splitted = explode("\n",wordwrap($product['name'], 30, "\n", true));
+      $text .= sprintf("%-30s   %' 9.2f        € %' 9.2f        € %' 9.2f\n",  $product_name_splitted[0],$product['amount'], $product['price']/100 , $product['total_price']/100);
+      // handle large product names
+      if (count($product_name_splitted) > 1) {
+        for ($i = 1 ; $i < count($product_name_splitted); $i++) $text.= $product_name_splitted[$i] ."\n";
+      }
+
     }
+
+    $text .= "\n";
+
+    $text .= sprintf("%-69s€ %' 9.2f\n" , "totaal excl. btw",$data['total_price_ex']/100);
 
     // tax
     foreach ($data['taxes'] as $tax) {
-      $html .= "<tr><td>BTW</td><td>" . $tax['rate_rate_type'] ;
-      $html .= "</td><td>".$tax['tax_rate'] . "%";
-      $html .= "</td><td>€ " . sprintf("%' 9.2f",$tax['tax_amount']/100) . "</td></tr>";
+      $text .= sprintf("%-30s    %' 9.2f%%%25s€ %' 9.2f\n","BTW". " ". $tax['rate_rate_type'],  $tax['tax_rate'], "" , $tax['tax_amount']/100);
     }
 
-    $html .= "<tr><td>totaal exc. btw.</td><td>";
-    $html .= "</td><td> ";
-    $html .= "</td><td>€ " . sprintf("%' 9.2f",$data['total_price_ex']/100) . "</td></tr>";
-
-    $html .= "<tr><td>totaal inc. btw.</td><td>";
-    $html .= "</td><td> ";
-    $html .= "</td><td>€ " . sprintf("%' 9.2f",$data['total_price_in']/100) . "</td></tr>";
+    //$text .= sprintf(str_pad("totaal inc. btw",69)."€ %' 9.2f\n" , $data['total_price_in']/100);
+    $text .= sprintf("%-69s€ %' 9.2f\n" , "totaal incl. btw",$data['total_price_in']/100);
 
 
-    $html .= "</table>";
 
     $pdf->SetY(120);
-    $pdf->writeHTML($html);
+//    $pdf->writeHTML($html);
+    $pdf->Multicell(0, 0, $text);
     
 /* END STUB -- as copied from Invoice::displayInvoice */
 
