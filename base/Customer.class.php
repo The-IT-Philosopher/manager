@@ -229,7 +229,20 @@ class Customer extends Component {
   }
 
 //------------------------------------------------------------------------------
+  function getCustomerVAT($customerId) {
 
+    $sth = $this->stone->pdo->prepare("SELECT organisation_vat
+                                FROM   link_customer2organisation
+                                JOIN   organisation 
+                                  ON link_customer2organisation.organisation_id = organisation.organisation_id 
+                                JOIN   link_address2organisation 
+                                  ON link_address2organisation.organisation_id = organisation.organisation_id
+                                 WHERE customer_id = :customer_id ")   ;
+    $sth->execute(array(":customer_id"=>$customerId));
+    return $sth->fetchColumn();
+  }
+
+//------------------------------------------------------------------------------
   function getCustomerAddress($customerId, $addressType=NULL) {
 
     $query = "SELECT  *  FROM  

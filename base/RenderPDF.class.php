@@ -90,59 +90,64 @@ class RenderPDF extends Component implements Render {
     $pdf->AddPage();
 
     $address_format = "{customer_name}\n{address_street} {address_number}\n{address_postalcode}  {address_city}\n";
-    $address = str_replace("{customer_name}", $data['address']['customer_name'], $address_format);
-    $address = str_replace("{address_street}", $data['address']['address_street'], $address);
-    $address = str_replace("{address_number}", $data['address']['address_number'], $address);
-    $address = str_replace("{address_postalcode}", $data['address']['address_postalcode'], $address);
-    $address = str_replace("{address_city}", $data['address']['address_city'], $address);
+    $address = str_replace("{customer_name}", $data['billing_address']['customer_name'], $address_format);
+    $address = str_replace("{address_street}", $data['billing_address']['address_street'], $address);
+    $address = str_replace("{address_number}", $data['billing_address']['address_number'], $address);
+    $address = str_replace("{address_postalcode}", $data['billing_address']['address_postalcode'], $address);
+    $address = str_replace("{address_city}", $data['billing_address']['address_city'], $address);
     //$pdf->SetXY(150,10);
     $pdf->SetY(60);
     $pdf->Multicell(0, 0, $address);
 
 
-    $invoice_data_format ="Klantnummer:   {customer_number}\nFactuurnummer: {invoice_number}\nFactuurdatum:  {invoice_date}\n";
-    $invoice_data = str_replace("{customer_number}", $data['invoice_data']['customer_number'], $invoice_data_format);
-    $invoice_data = str_replace("{invoice_number}", $data['invoice_data']['invoice_number'], $invoice_data);
-    $invoice_data = str_replace("{invoice_date}", $data['invoice_data']['invoice_date'], $invoice_data);
+    //$invoice_data_format ="Klantnummer:   {customer_number}\nFactuurnummer: {invoice_number}\nFactuurdatum:  {invoice_date}\n";
+    //$invoice_data = str_replace("{customer_number}", $data['invoice_data']['customer_number'], $invoice_data_format);
+    //$invoice_data = str_replace("{invoice_number}", $data['invoice_data']['invoice_number'], $invoice_data);
+    //$invoice_data = str_replace("{invoice_date}", $data['invoice_data']['invoice_date'], $invoice_data);
     //$pdf->SetXY(150,10);
     $pdf->SetY(90);
-    $pdf->Multicell(0, 0, $invoice_data);
+    //$pdf->Multicell(0, 0, $invoice_data);
+    $pdf->Cell(0,0, "Klantnummer:   " . sprintf("%04u",$data['invoice_data']['customer_id']),0,1);
+    $pdf->Cell(0,0, "Factuurnummer: " . $data['invoice_data']['invoice_number'],0,1);
+    $pdf->Cell(0,0, "Factuurdatum:  " . $data['invoice_data']['invoice_date'],0,1);
+    if (strlen(@$data['invoice_data']['vat_number'])) $pdf->Cell(0,0, "BTW nr. Klant: " . $data['invoice_data']['vat_number'],0,1);
 
+
+    $pdf->SetY(130);
+
+
+    $pdf->Cell(0, 0, sprintf("%-8s  %-25s  %-13s%-19s%s","SKU#","Omschrijving", "Aantal", "Prijs", "Totaal"),0,1);
+    $pdf->Cell(0, 0,"",0,1);
 
     foreach ($data['products'] as $product) {
-      // TODO reserve space for product numbers?
-      $product_name_splitted = explode("\n",wordwrap($product['name'], 30, "\n", true));
-      $text .= sprintf("%-30s   %' 9.2f        € %' 9.2f        € %' 9.2f\n",  $product_name_splitted[0],$product['amount'], $product['price']/100 , $product['total_price']/100);
+      // TODO are we going to support product numbers?
+      $product_name_splitted = explode("\n",wordwrap($product['name'], 25, "\n", true));
+    $pdf->Cell(0, 0,sprintf("%-8s  %-25s  %-' 9.2f    € %' 9.2f        € %' 9.2f",  $product['sku'], $product_name_splitted[0],$product['amount'], $product['price']/100 , $product['total_price']/100),0,1);
       // handle large product names
       if (count($product_name_splitted) > 1) {
-        for ($i = 1 ; $i < count($product_name_splitted); $i++) $text.= $product_name_splitted[$i] ."\n";
+        for ($i = 1 ; $i < count($product_name_splitted); $i++) 
+          $pdf->Cell(0, 0,$product_name_splitted[$i] ,0,1);
       }
 
     }
 
-    $text .= "\n";
+    $pdf->Cell(0, 0,"",0,1);
 
-    $text .= sprintf("%-69s€ %' 9.2f\n" , "totaal excl. btw",$data['total_price_ex']/100);
+    $pdf->Cell(0, 0,sprintf("          %-57s  € %' 9.2f" , "Totaal excl. BTW",$data['total_price_ex']/100),0,1);
 
     // tax
     foreach ($data['taxes'] as $tax) {
-      $text .= sprintf("%-30s    %' 9.2f%%%25s€ %' 9.2f\n","BTW". " ". $tax['rate_rate_type'],  $tax['tax_rate'], "" , $tax['tax_amount']/100);
+      $pdf->Cell(0, 0,sprintf("          %-25s  %-' 7.2f  %%   € %9.2f        € %' 9.2f","BTW". " ". $tax['rate_rate_type'],  $tax['tax_rate'], $tax['taxed_amount']/100 , $tax['tax_amount']/100),0,1);
     }
 
-    //$text .= sprintf(str_pad("totaal inc. btw",69)."€ %' 9.2f\n" , $data['total_price_in']/100);
-    $text .= sprintf("%-69s€ %' 9.2f\n" , "totaal incl. btw",$data['total_price_in']/100);
+    $pdf->Cell(0, 0,sprintf("          %-57s  € %' 9.2f" , "Totaal incl. BTW",$data['total_price_in']/100),0,1);
 
 
 
-    $pdf->SetY(120);
-//    $pdf->writeHTML($html);
-    $pdf->Multicell(0, 0, $text);
+
     
-/* END STUB -- as copied from Invoice::displayInvoice */
-
-    // clear the output buffer as some code has already outputted something
-    // this must be investigated // $sent = headers_sent($file, $line);
-//    ob_clean(); // how is this doing anything when I've disabled output buffering?
+    // just to be sure... there *should* be nothing in the buffer
+    ob_clean(); 
 
     $pdf->Output('invoice.pdf', 'I');
   }

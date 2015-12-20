@@ -38,19 +38,13 @@ class RenderHTML5 extends Component implements Render {
   
   //stub
   function render($data) {
-    //DEBUG
-    $file=""; $line="";
-		$content = ob_get_contents();
-
-    $sent = headers_sent($file, $line);
-    $data['content_raw'] .= "<PRE>OUTPUT STARTED: $file $line </PRE><PRE>$content</PRE>";
 
 
 
     if (defined("dev"))     $output = file_get_contents(__DIR__."/template/index-dev.tpl"); else
     $output = file_get_contents(__DIR__."/template/index.tpl");
 
-    $template_url = "/".str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__."/template/");
+    $template_url = str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__."/template/");
     $output = str_replace("{template_path}",$template_url,$output);
 
 

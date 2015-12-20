@@ -375,10 +375,11 @@ class Project extends Component {
 
 
       // TODO:: to be moved to invoice
+      // We need the "AS invoice2" in the inner query to fix a MySQL/MariaDB specific error
       $sth = $this->stone->pdo->prepare("INSERT INTO invoice (customer_id, invoice_sequence_nr, invoice_date) 
       VALUES
       (:customer_id, 
-( SELECT 1 + IFNULL(MAX(invoice_sequence_nr),0) FROM invoice i2 WHERE customer_id = :customer_id ) ,
+( SELECT 1 + IFNULL(MAX(invoice_sequence_nr),0) FROM invoice AS invoice2 WHERE customer_id = :customer_id ) ,
       :invoice_date) ");
 
       $invoice_date = $_POST['date'];

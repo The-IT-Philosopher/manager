@@ -32,6 +32,37 @@ namespace Philosopher;
 
 class Invoice extends Component {
 
+  function init(){
+    $this->stone->Page->registerPage(
+      array("invoices" => array (
+        "process" => array( $this, "ProcessPage")
+      )));
+
+  }
+
+  function ProcessPage(){
+    //STUB
+      $this->generateInvoice($this->getInvoice(8));
+
+    if (isset($_POST['invoice_id'])) {
+      $this->generateInvoice($this->getInvoice($_POST['invoice_id']));
+    }
+
+    $this->stone->_data['content_raw'] .= "Facturatie<br>"; 
+    $sth = $this->stone->pdo->prepare("SELECT * FROM invoice");
+    $sth->execute();
+    $this->stone->_data['content_raw'] .= "<FORM METHOD=POST>";
+    while ($invoice_data = $sth->fetch(\PDO::FETCH_ASSOC)) {
+      $invoice_timestamp = strtotime($invoice_data['invoice_date']);
+      $invoice_data['invoice_number'] = sprintf("%04u-%1u-%04u-%04u", 
+            date("Y", $invoice_timestamp ) , 
+            date("n", $invoice_timestamp )/4, 
+            $invoice_data['customer_id'],
+            $invoice_data['invoice_sequence_nr']) ;
+      $this->stone->_data['content_raw'] .= "<button type=submit name=invoice_id value=".$invoice_data['invoice_id'].">".$invoice_data['invoice_number']."</button>"; 
+    }
+    $this->stone->_data['content_raw'] .= "</FORM>";
+  }
 
   function displayInvoice($data) {
     //STUB
@@ -80,7 +111,6 @@ $this->stone->_data['content_raw'] .= "<PRE>" . var_export($data,true) . "</PRE>
     $this->stone->RenderPDF->render($data);
     die(); 
   }
-
 //------------------------------------------------------------------------------
 function generateProjectPeriod($projectId, $begin, $end, $alreadyBilled=false){
     $info    = $this->stone->Project->getProjectInfo($projectId);
@@ -94,6 +124,7 @@ function generateProjectPeriod($projectId, $begin, $end, $alreadyBilled=false){
 
     $this->stone->_data['content_raw'] .= "<PRE>\nBegin: $begin \nEnd: $end \nMonth: $Month \nYear:$Year</PRE>";
     $product['name'] = $project_name ." (" . strftime("%B", strtotime("${Year}-${Month}") ) .")";
+    $product['project_id'] = $projectId;
 
     switch ($info['project_billing_type']) {
       case "timed":
@@ -182,19 +213,95 @@ function generateProjectPeriod($projectId, $begin, $end, $alreadyBilled=false){
     $tax_rate = 21;
     $tax_amount = round(($tax_rate * $amount) / 100);
 
-    $tax = array ("rate_rate_type"=>"high", "tax_rate"=>$tax_rate, "tax_amount"=> $tax_amount);
+    $tax = array ("rate_rate_type"=>"hoog", "tax_rate"=>$tax_rate, "tax_amount"=> $tax_amount);
     $taxes = array ($tax);
 
     $total_price = $product['total_price'];    
     $customer_id = $address['customer_id'];
-    $data = array("customer_id"=>$customer_id, "month"=> $Month, "year"=> $Year, "address" => $address , "products"=>$products, "taxes" => $taxes, "total_price_ex" => $total_price, "total_price_in" => $total_price + $tax_amount, "currency" => $info['project_billing_currency']);
+    $data = array("customer_id"=>$customer_id, "month"=> $Month, "year"=> $Year, "billing_address" => $address , "products"=>$products, "taxes" => $taxes, "total_price_ex" => $total_price, "total_price_in" => $total_price + $tax_amount, "currency" => $info['project_billing_currency']);
     if (isset($hourIds)) $data['project_hours_id'] = $hourIds;
     
     return $data;
   }
 
   function getInvoice($invoice_id) {
-    
+    //  invoice (customer_id, invoice_sequence_nr, invoice_date)
+    $data = array();
+    $data['products'] = array();
+    $sth = $this->stone->pdo->prepare("SELECT * FROM invoice WHERE invoice_id = :invoice_id");
+    $sth->execute(array(":invoice_id" => $invoice_id));
+    $data['invoice_data'] = $sth->fetch(\PDO::FETCH_ASSOC);
+    $invoice_timestamp = strtotime($data['invoice_data']['invoice_date']);
+    $data['invoice_data']['invoice_number'] = sprintf("%04u-%1u-%04u-%04u", 
+          date("Y", $invoice_timestamp ) , 
+          1 + date("n", $invoice_timestamp )/4, 
+          $data['invoice_data']['customer_id'],
+          $data['invoice_data']['invoice_sequence_nr']) ;
+
+    $data['invoice_data']['vat_number'] = $this->stone->Customer->getCustomerVAT($data['invoice_data']['customer_id']);
+
+    $data['billing_address'] = $this->stone->Customer->getCustomerAddress($data['invoice_data']['customer_id']);
+
+    $sth = $this->stone->pdo->prepare("SELECT project_id, 
+      SUM(project_hours_hours) + 0.25 * SUM(project_hours_quarters) AS project_hours
+            FROM link_invoice2project_hours 
+            JOIN project_hours 
+              ON project_hours.project_hours_id = link_invoice2project_hours.project_hours_id
+            WHERE invoice_id = :invoice_id
+            GROUP BY project_id");
+    $sth->execute(array(":invoice_id" => $invoice_id));
+
+
+    $total_price=0;
+    while ($project_hours = $sth->fetch(\PDO::FETCH_ASSOC)) {
+      $info = $this->stone->Project->getProjectInfo($project_hours['project_id']);
+
+      $product = array();
+      $project_name = $info['project_description_short'];
+
+      // actually... no ... minus one month ... as billing is in the following month
+      //$product['name'] = $project_name ." (" . strftime("%B", $invoice_timestamp ) .")";
+      // skip it for now.... add it to invoice suffix or something
+      $product['name'] = $project_name;
+      $product['sku'] = sprintf("J%04u", $project_hours['project_id']); ;
+
+      switch ($info['project_billing_type']) {
+        case "timed":
+          $hours = $project_hours['project_hours'];
+          $product['amount'] = $hours;
+          $rate  = $info['project_billing_rate'];
+          $product['price'] = $rate;
+          $amount = round($hours * $rate);
+          $product['total_price'] = $amount;
+          break;
+        case "fixed":
+          $amount = $info['project_billing_rate'];
+          $product['amount'] = 1;
+          $product['price'] = $amount;
+          $product['total_price'] = $amount;
+          break;
+        case "free":
+          $amount = $project_hours['project_hours'];
+          $product['amount'] = 1;
+          $product['price'] = 0;
+          $product['total_price'] = 0;
+      }
+      // for now, we assume all project are under the high tax rate
+      // only calculate the grand total for all billed projects
+      $total_price+=$product['total_price'];
+      $data['products'][]=$product;
+    }
+
+    // for now, we assume all project are under the dutch high tax rate
+    $tax_rate = 21;
+    $tax_amount = round(($tax_rate * $total_price) / 100);
+    $tax = array ("rate_rate_type"=>"hoog", "tax_rate"=>$tax_rate, "tax_amount"=> $tax_amount, "taxed_amount" => $total_price );
+    $data['taxes'] = array ($tax);
+
+    $data["total_price_ex"] = $total_price;
+    $data["total_price_in"] = $total_price + $tax_amount;
+    $data["currency"] = $info['project_billing_currency'];
+    return $data;
   }
 
 }
