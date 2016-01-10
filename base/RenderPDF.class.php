@@ -69,6 +69,12 @@ Paypal    info@philosopher.it
 ");
 
   }
+
+  function Footer() {
+    $this->SetY(-10);
+    $this->SetFont($this->myfonts['ubuntu_mono'], '', 8);
+    $this->Cell(0, 0, "Gelieve deze factuur binnen 14 dagen na ontvangst te betalen.");
+  }
 }
 
 
@@ -84,8 +90,12 @@ class RenderPDF extends Component implements Render {
     $pdf->setHeaderMargin(10);
     // add a page
 
-    // left/top/right
-    $pdf->SetMargins(10, 50, 10);
+    // left/top/right/keep
+    $pdf->SetMargins(10, 60, 10, true);
+    // for some reason, the bottom margin is set through a different function
+    // orientation P = Portrait (Staand) L = Landscape (Liggend) / auto pagebreaj / bottom margin
+    $pdf->setPageOrientation 	("P", true , 25);  		
+
 
     $pdf->AddPage();
 
@@ -95,8 +105,8 @@ class RenderPDF extends Component implements Render {
     $address = str_replace("{address_number}", $data['billing_address']['address_number'], $address);
     $address = str_replace("{address_postalcode}", $data['billing_address']['address_postalcode'], $address);
     $address = str_replace("{address_city}", $data['billing_address']['address_city'], $address);
-    //$pdf->SetXY(150,10);
-    $pdf->SetY(60);
+
+//    $pdf->SetY(60); // we set the margins to 60 top so no setting Y here
     $pdf->Multicell(0, 0, $address);
 
 
@@ -117,7 +127,30 @@ class RenderPDF extends Component implements Render {
 
 
     $pdf->Cell(0, 0, sprintf("%-8s  %-25s  %-13s%-19s%s","SKU#","Omschrijving", "Aantal", "Prijs", "Totaal"),0,1);
-    $pdf->Cell(0, 0,"",0,1);
+
+    $positions = array();
+    
+
+    // use this for positioning // 10,32,88,115,156
+    $test = sprintf("%-8s  ","SKU#");
+    $positions[]= (int)$pdf->GetX();
+    $pdf->Write(0,$test);
+    $test = sprintf("%-25s  ","Omschrijving"); 
+    $positions[]= (int)$pdf->GetX();
+    $pdf->Write(0,$test);
+    $test = sprintf("%-13s", "Aantal");// %-19s%s", "Prijs", "Totaal")    
+    $positions[]= (int)$pdf->GetX();
+    $pdf->Write(0,$test);
+    $test = sprintf("%-19s", "Aantal", "Prijs");// %s", "Totaal")
+    $positions[]= (int)$pdf->GetX();
+    $pdf->Write(0,$test);
+    $test = sprintf("%s", "Totaal");
+    $positions[]= (int)$pdf->GetX();
+    $pdf->Write(0,$test);
+    $pdf->Ln();
+    $pdf->Cell(0, 0, sprintf("%-8s  %-25s  %-13s%-19s%s",$positions[0], $positions[1], $positions[2], $positions[3], $positions[4] ),0,1);
+
+
 
     foreach ($data['products'] as $product) {
       // TODO are we going to support product numbers?
@@ -131,7 +164,7 @@ class RenderPDF extends Component implements Render {
 
     }
 
-    $pdf->Cell(0, 0,"",0,1);
+    $pdf->Ln();
 
     $pdf->Cell(0, 0,sprintf("          %-57s  € %' 9.2f" , "Totaal excl. BTW",$data['total_price_ex']/100),0,1);
 
@@ -149,7 +182,7 @@ class RenderPDF extends Component implements Render {
     // just to be sure... there *should* be nothing in the buffer
     ob_clean(); 
 
-    $pdf->Output('invoice.pdf', 'I');
+    $pdf->Output($data['invoice_data']['invoice_number'].'.pdf', 'I');
   }
 }
 ?>
