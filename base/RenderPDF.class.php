@@ -99,6 +99,9 @@ class RenderPDF extends Component implements Render {
 
     $pdf->AddPage();
 
+    $positions = array(10,32,88,115,156);
+
+    // TODO: address_format needs to be configurable / a parameter / as there are different formats per country  
     $address_format = "{customer_name}\n{address_street} {address_number}\n{address_postalcode}  {address_city}\n";
     $address = str_replace("{customer_name}", $data['billing_address']['customer_name'], $address_format);
     $address = str_replace("{address_street}", $data['billing_address']['address_street'], $address);
@@ -117,63 +120,94 @@ class RenderPDF extends Component implements Render {
     //$pdf->SetXY(150,10);
     $pdf->SetY(90);
     //$pdf->Multicell(0, 0, $invoice_data);
-    $pdf->Cell(0,0, "Klantnummer:   " . sprintf("%04u",$data['invoice_data']['customer_id']),0,1);
-    $pdf->Cell(0,0, "Factuurnummer: " . $data['invoice_data']['invoice_number'],0,1);
-    $pdf->Cell(0,0, "Factuurdatum:  " . $data['invoice_data']['invoice_date'],0,1);
+    $pdf->Cell(0,0, "Klantnummer    " . sprintf("%04u",$data['invoice_data']['customer_id']),0,1);
+    $pdf->Cell(0,0, "Factuurnummer  " . $data['invoice_data']['invoice_number'],0,1);
+    $pdf->Cell(0,0, "Factuurdatum   " . $data['invoice_data']['invoice_date'],0,1);
     if (strlen(@$data['invoice_data']['vat_number'])) $pdf->Cell(0,0, "BTW nr. Klant: " . $data['invoice_data']['vat_number'],0,1);
 
 
     $pdf->SetY(130);
 
 
-    $pdf->Cell(0, 0, sprintf("%-8s  %-25s  %-13s%-19s%s","SKU#","Omschrijving", "Aantal", "Prijs", "Totaal"),0,1);
-
-    $positions = array();
-    
-
-    // use this for positioning // 10,32,88,115,156
-    $test = sprintf("%-8s  ","SKU#");
-    $positions[]= (int)$pdf->GetX();
-    $pdf->Write(0,$test);
-    $test = sprintf("%-25s  ","Omschrijving"); 
-    $positions[]= (int)$pdf->GetX();
-    $pdf->Write(0,$test);
-    $test = sprintf("%-13s", "Aantal");// %-19s%s", "Prijs", "Totaal")    
-    $positions[]= (int)$pdf->GetX();
-    $pdf->Write(0,$test);
-    $test = sprintf("%-19s", "Aantal", "Prijs");// %s", "Totaal")
-    $positions[]= (int)$pdf->GetX();
-    $pdf->Write(0,$test);
-    $test = sprintf("%s", "Totaal");
-    $positions[]= (int)$pdf->GetX();
-    $pdf->Write(0,$test);
+    //$pdf->Cell(0, 0, sprintf("%-8s  %-25s  %-13s%-19s%s","SKU#","Omschrijving", "Aantal", "Prijs", "Totaal"),0,1);
+    $pdf->SetX($positions[0]);
+    $pdf->Write(0,"SKU#");
+    $pdf->SetX($positions[1]);
+    $pdf->Write(0,"Omschrijving");
+    $pdf->SetX($positions[2]);
+    $pdf->Write(0,"Aantal");
+    $pdf->SetX($positions[3]);
+    $pdf->Write(0,"Stukprijs");   
+    $pdf->SetX($positions[4]); 
+    $pdf->Write(0,"Totaal");
     $pdf->Ln();
-    $pdf->Cell(0, 0, sprintf("%-8s  %-25s  %-13s%-19s%s",$positions[0], $positions[1], $positions[2], $positions[3], $positions[4] ),0,1);
-
 
 
     foreach ($data['products'] as $product) {
       // TODO are we going to support product numbers?
       $product_name_splitted = explode("\n",wordwrap($product['name'], 25, "\n", true));
-    $pdf->Cell(0, 0,sprintf("%-8s  %-25s  %-' 9.2f    € %' 9.2f        € %' 9.2f",  $product['sku'], $product_name_splitted[0],$product['amount'], $product['price']/100 , $product['total_price']/100),0,1);
+    //$pdf->Cell(0, 0,sprintf("%-8s  %-25s  %-' 9.2f    € %' 9.2f        € %' 9.2f",  $product['sku'], $product_name_splitted[0],$product['amount'], $product['price']/100 , $product['total_price']/100),0,1);
+
+      // TODO currency is hard coded to EURO now
+
+      $pdf->SetX($positions[0]);
+      $pdf->Write(0,$product['sku']);
+      $pdf->SetX($positions[1]);
+      $pdf->Write(0,$product_name_splitted[0]);
+      $pdf->SetX($positions[2]);
+      $pdf->Write(0,$product['amount']);
+      $pdf->SetX($positions[3]);
+      $pdf->Write(0,sprintf("€ %' 9.2f",$product['price']/100));   
+      $pdf->SetX($positions[4]); 
+      $pdf->Write(0,sprintf("€ %' 9.2f",$product['total_price']/100));
+      $pdf->Ln();
+
       // handle large product names
       if (count($product_name_splitted) > 1) {
         for ($i = 1 ; $i < count($product_name_splitted); $i++) 
-          $pdf->Cell(0, 0,$product_name_splitted[$i] ,0,1);
+          //$pdf->Cell(0, 0,$product_name_splitted[$i] ,0,1);
+          $pdf->SetX($positions[1]);
+          $pdf->Write(0,$product_name_splitted[$i]);
+          $pdt->Ln();
       }
 
     }
 
     $pdf->Ln();
 
-    $pdf->Cell(0, 0,sprintf("          %-57s  € %' 9.2f" , "Totaal excl. BTW",$data['total_price_ex']/100),0,1);
+
+
+    $pdf->SetX($positions[1]);
+    $pdf->Write(0,"Totaal excl. BTW");
+    $pdf->SetX($positions[4]); 
+    $pdf->Write(0,sprintf("€ %' 9.2f",$product['total_price_ex']/100));
+    $pdf->Ln();
+
+//    $pdf->Cell(0, 0,sprintf("          %-57s  € %' 9.2f" , ,$data['total_price_ex']/100),0,1);
 
     // tax
     foreach ($data['taxes'] as $tax) {
-      $pdf->Cell(0, 0,sprintf("          %-25s  %-' 7.2f  %%   € %9.2f        € %' 9.2f","BTW". " ". $tax['rate_rate_type'],  $tax['tax_rate'], $tax['taxed_amount']/100 , $tax['tax_amount']/100),0,1);
+      //$pdf->Cell(0, 0,sprintf("          %-25s  %-' 7.2f  %%   € %9.2f        € %' 9.2f","BTW". " ". $tax['rate_rate_type'],  $tax['tax_rate'], $tax['taxed_amount']/100 , $tax['tax_amount']/100),0,1);
+
+      $pdf->SetX($positions[1]);
+      $pdf->Write(0,"BTW". " ". $tax['rate_rate_type']);
+      $pdf->SetX($positions[2]);
+      $pdf->Write(0,sprintf("%-' 7.2f  %%",$tax['tax_rate']));
+      $pdf->SetX($positions[3]);
+      $pdf->Write(0,sprintf("€ %' 9.2f",$tax['taxed_amount']/100));   
+      $pdf->SetX($positions[4]); 
+      $pdf->Write(0,sprintf("€ %' 9.2f",$tax['tax_amount']/100));
+      $pdf->Ln();
+
+
     }
 
-    $pdf->Cell(0, 0,sprintf("          %-57s  € %' 9.2f" , "Totaal incl. BTW",$data['total_price_in']/100),0,1);
+//    $pdf->Cell(0, 0,sprintf("          %-57s  € %' 9.2f" , "Totaal incl. BTW",$data['total_price_in']/100),0,1);
+  $pdf->SetX($positions[1]);
+    $pdf->Write(0,"Totaal incl. BTW");
+    $pdf->SetX($positions[4]); 
+    $pdf->Write(0,sprintf("€ %' 9.2f",$product['total_price_in']/100));
+    $pdf->Ln();
 
 
 

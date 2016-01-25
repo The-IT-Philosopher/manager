@@ -50,6 +50,10 @@ class Address extends Component {
   }
 //------------------------------------------------------------------------------
   function render_xml(){
+    $this->render()->GenerateForm(NULL, "Voer adresgegevens in");
+  }
+//------------------------------------------------------------------------------
+  function render(){
     $form = new Form();
     $form->addElement(new FormInputElement("address_street","Straat"));
     $form->addElement(new FormInputElement("address_number","Huisnummer"));
@@ -57,7 +61,8 @@ class Address extends Component {
     $form->addElement(new FormInputElement("address_city","Stad"));
     //$form->addElement(new FormInputElement("address_province","Provincie"));
     //$form->addElement(new FormInputElement("address_country","Land")); //!! ISO CODE, DROPDOWN
-    return $form->GenerateForm(NULL, "Voer adresgegevens in");
+    //return $form->GenerateForm(NULL, "Voer adresgegevens in");
+    return $form;
   }
 //------------------------------------------------------------------------------
   function process(){
