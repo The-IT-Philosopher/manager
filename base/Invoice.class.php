@@ -42,7 +42,7 @@ class Invoice extends Component {
 
   function ProcessPage(){
     //STUB
-      $this->generateInvoice($this->getInvoice(8));
+//      $this->generateInvoice($this->getInvoice(8));
 
     if (isset($_POST['invoice_id'])) {
       $this->generateInvoice($this->getInvoice($_POST['invoice_id']));

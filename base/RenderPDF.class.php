@@ -73,7 +73,7 @@ Paypal    info@philosopher.it
   function Footer() {
     $this->SetY(-10);
     $this->SetFont($this->myfonts['ubuntu_mono'], '', 8);
-    $this->Cell(0, 0, "Gelieve deze factuur binnen 14 dagen na ontvangst te betalen.");
+    $this->Cell(0, 0, "Gelieve deze factuur binnen 14 dagen na ontvangst te betalen onder vermelding van het factuurnummer.");
   }
 }
 
@@ -164,11 +164,12 @@ class RenderPDF extends Component implements Render {
 
       // handle large product names
       if (count($product_name_splitted) > 1) {
-        for ($i = 1 ; $i < count($product_name_splitted); $i++) 
+        for ($i = 1 ; $i < count($product_name_splitted);$i++) {
           //$pdf->Cell(0, 0,$product_name_splitted[$i] ,0,1);
           $pdf->SetX($positions[1]);
-          $pdf->Write(0,$product_name_splitted[$i]);
-          $pdt->Ln();
+          $pdf->Write(0, $product_name_splitted[$i]);
+          $pdf->Ln();
+        }
       }
 
     }
@@ -180,7 +181,7 @@ class RenderPDF extends Component implements Render {
     $pdf->SetX($positions[1]);
     $pdf->Write(0,"Totaal excl. BTW");
     $pdf->SetX($positions[4]); 
-    $pdf->Write(0,sprintf("€ %' 9.2f",$product['total_price_ex']/100));
+    $pdf->Write(0,sprintf("€ %' 9.2f",$data['total_price_ex']/100));
     $pdf->Ln();
 
 //    $pdf->Cell(0, 0,sprintf("          %-57s  € %' 9.2f" , ,$data['total_price_ex']/100),0,1);
@@ -206,7 +207,7 @@ class RenderPDF extends Component implements Render {
   $pdf->SetX($positions[1]);
     $pdf->Write(0,"Totaal incl. BTW");
     $pdf->SetX($positions[4]); 
-    $pdf->Write(0,sprintf("€ %' 9.2f",$product['total_price_in']/100));
+    $pdf->Write(0,sprintf("€ %' 9.2f",$data['total_price_in']/100));
     $pdf->Ln();
 
 

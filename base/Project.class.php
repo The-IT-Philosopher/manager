@@ -508,6 +508,7 @@ class Project extends Component {
       $hoursThisMonth[$project_hour['project_hours_date']] = $project_hour['project_time'];
     }
 
+
     $result .= "<STYLE>table, th, td { border: 1px solid black; }</STYLE>";
 
     $daysThisMonth = date("t");
@@ -519,7 +520,8 @@ class Project extends Component {
     $Month = array(); 
     $Week  = array();
     for ($day = 1 ; $day <= $daysThisMonth ; $day++) {
-      $checkdate = date("Y-")  . $currentMonth. "-" . sprintf("%02d",$day);
+      $checkdate = date("Y-")  . sprintf("%02d",$currentMonth) . "-" . sprintf("%02d",$day);
+
 
       $hours = "<div class='d'>".date("d",strtotime($checkdate)) . "</div><div class='h'>" . (float)@$hoursThisMonth[$checkdate] ."</div>";
 //debug//      $hours = "<div class='d'>".$checkdate . "</div><div class='h'>" . (int)@$hoursThisMonth[$checkdate] ."</div>";
