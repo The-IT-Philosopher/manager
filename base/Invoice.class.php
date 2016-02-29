@@ -56,7 +56,7 @@ class Invoice extends Component {
       $invoice_timestamp = strtotime($invoice_data['invoice_date']);
       $invoice_data['invoice_number'] = sprintf("%04u-%1u-%04u-%04u", 
             date("Y", $invoice_timestamp ) , 
-            date("n", $invoice_timestamp )/4, 
+            1+date("n", $invoice_timestamp )/4, 
             $invoice_data['customer_id'],
             $invoice_data['invoice_sequence_nr']) ;
       $this->stone->_data['content_raw'] .= "<button type=submit name=invoice_id value=".$invoice_data['invoice_id'].">".$invoice_data['invoice_number']."</button>"; 
